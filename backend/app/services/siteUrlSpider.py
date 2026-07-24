@@ -31,7 +31,7 @@ class URLInfo(object):
     def __eq__(self, other):
         if not isinstance(other, URLInfo):
             return False
-        return self.crawl_url == self.crawl_url
+        return self.crawl_url == other.crawl_url
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -52,7 +52,7 @@ class URLInfo(object):
 class URLList(object):
     def __init__(self):
         self.result = []
-        self.similar_hash_pool = []
+        self.similar_hash_pool = set()
 
     def __iter__(self):
         return self.result.__iter__()
@@ -99,7 +99,7 @@ class URLSimilarList(URLList):
 
         if element.similar_hash() not in self.similar_hash_pool:
             self.result.append(element)
-            self.similar_hash_pool.append(element.similar_hash())
+            self.similar_hash_pool.add(element.similar_hash())
 
 
 class SiteURLSpider(object):

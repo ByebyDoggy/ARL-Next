@@ -113,6 +113,7 @@ class Page():
         self._is_back_up_path = None
         self._is_back_up_page = None
         self.back_up_suffix_list = [".tar", ".tar.gz", ".zip", ".rar", ".7z", ".bz2", ".gz", ".war"]
+        self.clean_content = self.content.replace(self.url.payload.encode(), b"")
 
     def __eq__(self, other):
         """
@@ -157,9 +158,13 @@ class Page():
                 else:
                     return False
 
-            # 3. 如果是 200 OK 的页面，抹去页面里反射回来的 payload（防止因为路径回显导致页面不一样）
-            self_content = self.content.replace(self.url.payload.encode(), b"")
-            other_content = other.content.replace(other.url.payload.encode(), b"")
+            # 3. 如果是 200 OK 的页面，使用已经抹去页面里反射回来的 payload 的 clean_content
+            self_content = self.clean_content
+            other_content = other.clean_content
+            
+            if self_content == other_content:
+                self.times += 1
+                return True
 
             # 如果两个页面的大小差距在 5 个字节以内，直接认为一模一样！(应对极其微小的动态时间戳差异)
             if abs(len(self_content) - len(other_content)) <= 5:

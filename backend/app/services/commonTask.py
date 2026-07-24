@@ -163,7 +163,7 @@ class WebSiteFetch(object):
     def site_screenshot(self):
         # ***站点截图***
         capture_save_dir = Config.SCREENSHOT_DIR + "/" + self.task_id
-        services.site_screenshot(self.available_sites, concurrency=6, capture_dir=capture_save_dir)
+        services.site_screenshot(self.available_sites, concurrency=4, capture_dir=capture_save_dir)
 
     def site_spider(self):
         # *** 执行静态爬虫

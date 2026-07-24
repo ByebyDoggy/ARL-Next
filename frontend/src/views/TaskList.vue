@@ -177,9 +177,7 @@
 
             <a-button type="link" size="small" style="color: var(--arl-text-color); padding: 0 4px;" @click="stopSingleTask(record)" :disabled="record.status === 'done' || record.status === 'error'">停 止</a-button>
 
-            <a-popconfirm title="确定要彻底删除该任务及底层资产数据吗？" ok-text="删除" cancel-text="取消" @confirm="deleteSingleTask(record)">
-              <a-button type="link" size="small" style="color: var(--arl-text-color); padding: 0 4px;" :disabled="record.status !== 'done' && record.status !== 'error'">删 除</a-button>
-            </a-popconfirm>
+            <a-button type="link" size="small" style="color: var(--arl-text-color); padding: 0 4px;" :disabled="record.status !== 'done' && record.status !== 'error'" @click="deleteSingleTask(record)">删 除</a-button>
 
             <a-button type="link" size="small" style="color: var(--arl-text-color); padding: 0 4px;" @click="restartTask(record)">重 启</a-button>
           </a-space>
@@ -863,23 +861,40 @@ const stopSingleTask = async (record) => {
 };
 
 // 4. 删除单行任务 (Delete)
-const deleteSingleTask = async (record) => {
-  try {
-    // 对齐 Payload: 与批量删除接口一致，必须传数组，且硬编码 del_task_data: true
-    const res = await request.post('/task/delete/', {
-      task_id: [record._id || record.task_id],
-      del_task_data: true
-    });
+const deleteSingleTask = (record) => {
+  let isDeleteData = true;
 
-    if (res.code === 200) {
-      message.success('任务及资产数据已彻底销毁 💥');
-      fetchTasks(pagination.current, pagination.pageSize);
-    } else {
-      message.error('删除失败: ' + (res.message || '未知错误'));
+  Modal.confirm({
+    title: '删除确认',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: createVNode('div', { style: 'margin-top: 8px;' }, [
+      createVNode('div', { style: 'margin-bottom: 16px; color: var(--arl-text-color);' }, `确认要删除该任务吗？`),
+      createVNode(Checkbox, {
+        defaultChecked: isDeleteData,
+        onChange: (e) => { isDeleteData = e.target.checked; }
+      }, () => '同时删除该任务关联的所有资产数据 (不可恢复)')
+    ]),
+    okText: '确 定',
+    cancelText: '取 消',
+    okButtonProps: { danger: true },
+    onOk: async () => {
+      try {
+        const res = await request.post('/task/delete/', {
+          task_id: [record._id || record.task_id],
+          del_task_data: isDeleteData
+        });
+
+        if (res.code === 200) {
+          message.success('任务删除成功');
+          fetchTasks(pagination.current, pagination.pageSize);
+        } else {
+          message.error('删除失败: ' + (res.message || '未知错误'));
+        }
+      } catch (error) {
+        message.error('网络异常，删除失败');
+      }
     }
-  } catch (error) {
-    message.error('网络异常，删除失败');
-  }
+  });
 };
 
 // 5. 重启任务 (Restart)

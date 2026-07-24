@@ -38,7 +38,7 @@ async function main() {
         });
 
         try {
-            await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+            await page.goto(url, { waitUntil: 'networkidle2', timeout: 25000 });
         } catch (e) {
             // timeout is fine, we might still have DOM
         }
@@ -60,42 +60,44 @@ async function main() {
         wappalyzer.apps = json.apps;
         wappalyzer.categories = json.categories;
 
-        wappalyzer.driver = {
-            log: function(args) { },
-            displayApps: function() {
-                let apps = [];
-                for (let app in wappalyzer.detected[url]) {
-                    let cats = [];
-                    wappalyzer.apps[app].cats.forEach(function(cat) {
-                        cats.push(wappalyzer.categories[cat].name);
-                    });
-                    apps.push({
-                        name: app,
-                        confidence: wappalyzer.detected[url][app].confidenceTotal.toString(),
-                        version: wappalyzer.detected[url][app].version,
-                        icon: wappalyzer.apps[app].icon || 'default.svg',
-                        website: wappalyzer.apps[app].website,
-                        categories: cats
-                    });
+        await new Promise((resolve, reject) => {
+            wappalyzer.driver = {
+                log: function(args) { },
+                displayApps: function() {
+                    let apps = [];
+                    for (let app in wappalyzer.detected[url]) {
+                        let cats = [];
+                        wappalyzer.apps[app].cats.forEach(function(cat) {
+                            cats.push(wappalyzer.categories[cat].name);
+                        });
+                        apps.push({
+                            name: app,
+                            confidence: wappalyzer.detected[url][app].confidenceTotal.toString(),
+                            version: wappalyzer.detected[url][app].version,
+                            icon: wappalyzer.apps[app].icon || 'default.svg',
+                            website: wappalyzer.apps[app].website,
+                            categories: cats
+                        });
+                    }
+                    this.sendResponse(apps);
+                },
+                sendResponse: function(apps) {
+                    console.log(JSON.stringify({ url: url, originalUrl: url, applications: apps || [] }));
+                    resolve();
                 }
-                this.sendResponse(apps);
-            },
-            sendResponse: function(apps) {
-                console.log(JSON.stringify({ url: url, originalUrl: url, applications: apps || [] }));
-                process.exit(0);
-            }
-        };
+            };
 
-        const parsedUrl = new URL(url);
-        wappalyzer.analyze(parsedUrl.hostname, url, {
-            html: html,
-            headers: headers,
-            env: environmentVars
+            const parsedUrl = new URL(url);
+            wappalyzer.analyze(parsedUrl.hostname, url, {
+                html: html,
+                headers: headers,
+                env: environmentVars
+            });
         });
 
     } catch (e) {
         console.log(JSON.stringify({ url: url, originalUrl: url, applications: [] }));
-        process.exit(1);
+        process.exitCode = 1;
     } finally {
         if (browser) {
             await browser.close();

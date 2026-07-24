@@ -1,0 +1,25 @@
+FROM debian:bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Shanghai
+ENV NODE_PATH=/usr/local/lib/node_modules
+
+RUN apt-get update -o Acquire::Retries=10 && \
+    apt-get install -y --no-install-recommends \
+    wget curl tzdata ca-certificates \
+    libnss3 libatk-bridge2.0-0 libgtk-3-0 libx11-xcb1 \
+    libxcb-dri3-0 libxcomposite1 libxdamage1 libxrandr2 libgbm1 \
+    libasound2 libxshmfence1 libdrm2 libxkbcommon0 libatspi2.0-0 libcups2 \
+    fontconfig nodejs npm fonts-wqy-zenhei fonts-wqy-microhei chromium chromium-common && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /usr/share/doc/* /usr/share/man/* /usr/share/locale/*
+
+RUN npm install -g puppeteer-core@10.4.0 pm2 && \
+    npm cache clean --force && \
+    apt-get purge -y npm && \
+    apt-get autoremove -y
+
+WORKDIR /code
+COPY ./app/tools/puppeteer_server.js /code/backend/app/tools/puppeteer_server.js
+
+CMD ["node", "/code/backend/app/tools/puppeteer_server.js"]

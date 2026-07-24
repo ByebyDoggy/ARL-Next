@@ -398,8 +398,22 @@ done
 echo "🚀 正在启动生产多服务容器组并清理可能遗留的孤儿容器..."
 docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
-echo "⏳ 正在等待容器服务启动并进行健康状态检查 (大约需要 15 秒)..."
-sleep 15
+echo "⏳ 正在等待后端 API 就绪 (动态检测)..."
+MAX_WAIT=60
+WAIT_TIME=0
+while [ $WAIT_TIME -lt $MAX_WAIT ]; do
+    if docker exec arl-web-prod curl -s http://127.0.0.1:5000/ > /dev/null 2>&1; then
+        echo -e "\n✅ 后端服务已完全就绪 (耗时 $WAIT_TIME 秒)"
+        break
+    fi
+    sleep 2
+    WAIT_TIME=$((WAIT_TIME + 2))
+    echo -ne "   等待中... ($WAIT_TIME / $MAX_WAIT 秒)\r"
+done
+
+if [ $WAIT_TIME -ge $MAX_WAIT ]; then
+    echo -e "\n⚠️ 等待超时，服务可能仍在初始化或存在异常，请稍后重试。"
+fi
 
 # 检查是否有容器处于 exited 或 restarting 状态
 FAILED_SERVICES=$(docker compose -f docker-compose.prod.yml ps --status exited --status restarting --services)

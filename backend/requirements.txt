@@ -22,3 +22,4 @@ pycryptodome
 requests_ntlm
 dnslib
 pycryptodomex
+pyahocorasick

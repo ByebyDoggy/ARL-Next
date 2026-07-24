@@ -48,8 +48,25 @@ services:
       - mongodb
       - rabbitmq
       - osint-service
+      - arl-puppeteer
     networks:
       - arl-net
+
+  # Puppeteer 无头浏览器渲染专属微服务 (常驻 HTTP 服务，解决 CPU 瓶颈)
+  arl-puppeteer:
+    <<: *default-logging
+    image: crpi-laul1izptqrf0tkf.cn-beijing.personal.cr.aliyuncs.com/owl234-arl-prod/arl-puppeteer:latest
+    container_name: arl-puppeteer-prod
+    restart: always
+    command: bash -c "export NODE_PATH=/usr/local/lib/node_modules && node /code/backend/app/tools/puppeteer_server.js"
+    working_dir: /code
+    volumes:
+      - ./backend/app/tools/puppeteer_server.js:/code/backend/app/tools/puppeteer_server.js
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      - arl-net
+
 
   # 后台扫描任务 Worker
   arl-worker:

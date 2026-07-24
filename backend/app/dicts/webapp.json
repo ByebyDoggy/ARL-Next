@@ -2797,7 +2797,7 @@
         "title": [],
         "icon": "default.png",
         "website": "",
-        "fofa_rule": "header=\"set-cookie: phpmyadmin_https\" || body=\"-1010568750\" || body=\"-476231906\" || body=\"!\\[cdata\\[[<]*pma_version:\\\\\"([\\d.]+)\" || body=\"(?: \\| phpmyadmin ([\\d.]+)</title>|pma_sendheaderlocation\\(|<link [>]*href=\\\"[\\\"]*phpmyadmin\\.css\\.php)\" || body=\"pma_absolute_uri\""
+        "fofa_rule": "header=\"set-cookie: phpmyadmin_https\" || body=\"-1010568750\" || body=\"-476231906\" || body=\"pma_version\" || body=\"phpmyadmin\" || body=\"pma_absolute_uri\""
     },
     "Zhejiang Uniview Technologies Co.": {
         "cats": [

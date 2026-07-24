@@ -6,6 +6,7 @@
   <p>
     <a href="https://hub.docker.com/"><img src="https://img.shields.io/badge/docker-ready-blue.svg?style=flat-square&logo=docker" alt="Docker"></a>
     <img src="https://img.shields.io/badge/python-3.8%2B-blue?style=flat-square&logo=python" alt="Python">
+    <img src="https://img.shields.io/badge/node.js-18%2B-green?style=flat-square&logo=node.js" alt="Node.js">
     <img src="https://img.shields.io/badge/vue-3.x-4fc08d?style=flat-square&logo=vuedotjs" alt="Vue">
     <img src="https://img.shields.io/badge/MCP-Ready-purple?style=flat-square" alt="MCP">
   </p>
@@ -20,10 +21,10 @@
 **ARL-Next** 是 ARL (资产侦察灯塔) 的现代化重构版本，现已全面进化为 **AI 原生自动化资产侦察与漏洞监控平台**。核心亮点包括：
 
 * **🤖 AI 原生架构 (新!)**：原生集成 MCP，赋能 AI Agent 直接接管调度与检索，开启“对话式安全运营”。（👉 [**探索 MCP 玩法与配置指南**](./mcp-server/README.md)）
-* **🚀 引擎代际更替**：彻底淘汰 PhantomJS，全面升级为 Chromium 动态爬虫与最新 Nuclei 扫描引擎。
+* **🚀 引擎与架构微服务化**：淘汰 PhantomJS，全面升级 Chromium 与 Nuclei 引擎；剥离 OSINT 与无头浏览器微服务，指纹识别支持内存缓存，大幅提升扫描性能。
 * **🌐 多维资产闭环**：深度集成 ICP 与天眼查，全自动深挖企业网站、APP、小程序等多维度资产。
 * **🛡️ 持续威胁监控**：内置 GitHub 最新 CVE 漏洞追踪与代码泄露实时监控，实现威胁情报前置。
-* **⚡ 极致部署运维**：支持一键式生产部署、平滑热更新与 Basic Auth 强制防御；开发环境支持极速热重载。
+* **⚡ 极致部署运维**：支持一键式部署、容器自愈、平滑热更新与 Basic Auth 强制防御；开发环境支持极速热重载。
 
 ---
 
@@ -32,17 +33,17 @@
 * **全局仪表盘**：实时展示系统资源消耗、后台任务状态、多维风险统计及最新日志流。
   <br><img src="./img/dashboard.png" alt="仪表盘" width="800"><br>
 
-* **OSINT 资产侦察**：支持 ICP 备案与天眼查等开源情报关联检索，一键同步企业资产（网站/APP/小程序/公众号等）并无缝下发任务。
+* **OSINT 资产侦察**：支持 ICP 与天眼查等情报关联检索，一键同步企业多维资产并无缝下发任务。
   <br><img src="./img/enterprise-asset-search1.png" alt="资产侦察" width="800"><br>
 
-* **任务与指纹管理**：支持扫描任务全生命周期追踪、自定义 PoC 插件组合，以及全局细粒度的资产指纹检索。
+* **任务与指纹管理**：支持任务全生命周期追踪、多维过滤导出、自定义 PoC 组合及全局指纹检索。
   <br><img src="./img/task-new1.png" alt="任务新建" width="800"><br>
   <br><img src="./img/task-management.png" alt="任务管理" width="800"><br>
 
 * **威胁情报雷达**：支持最新 CVE 漏洞追踪与 **GitHub** 代码泄露实时监控。
   <br><img src="./img/threat-intel-radar1.png" alt="威胁情报雷达" width="800"><br>
 
-* **系统设置**：集成 Fofa/天眼查热配置、字典云端管理、轻重任务队列并发热扩缩容，及六大告警通道（钉钉/飞书/企微/Telegram/邮件/Webhook）一键测试。
+* **系统设置**：集成 API 热配置、字典云管理、队列并发热扩缩容，及六大告警通道一键测试。
   <br><img src="./img/system-settings1.png" alt="系统设置" width="800"><br>
 
 ---
@@ -52,10 +53,11 @@
 ARL-Next 采用前后端解耦的微服务架构，核心模块如下：
 
 1. 🖥️ **展示层 (Frontend)**：基于 **Vue 3.5** + **Vite 5.4** 构建，生产环境由 **Nginx** 托管，提供 HTTPS 安全网关与 **Basic Auth 前置防御**。
-2. ⚙️ **业务 API 层 (Backend)**：基于 **Python 3.8+** 与 **Flask**，处理核心业务逻辑、JWT 鉴权及本地化备案微服务。
+2. ⚙️ **业务 API 层 (Backend)**：基于 **Python 3.8+** 与 **Flask**，处理核心业务逻辑与 JWT 鉴权。
 3. 🤖 **AI 扩展层 (MCP Server)**：*(新!)* 独立集成 **Model Context Protocol** 服务，赋能外部 AI 大模型/Agent 直接接入并调度底层检索工具。
 4. ⚡ **消息与执行层 (Broker & Workers)**：采用 **RabbitMQ** + **Celery** 分布式集群，高效解耦调度 **Nuclei** 扫描与威胁监控等高并发任务。
 5. 🗄️ **数据存储 (Database)**：基于 **MongoDB**，承载千万级大宽表资产数据与漏洞结果落地。
+6. 🧩 **扩展微服务群 (Microservices)**：*(新!)* 包含 Node.js Puppeteer 渲染容器与 OSINT 情报容器，专职无头渲染与异步信息收集，彻底消除主节点任务阻塞。
 
 ---
 
@@ -71,14 +73,15 @@ ARL-Next 采用前后端解耦的微服务架构，核心模块如下：
 * **📦 极简轻量**：免环境配置、免 `docker login`，剔除冗余编译链，镜像减重超 700MB。
 * **🛡️ 极致防护**：自动签发 SSL 并强制生成 **Basic Auth 前置拦截**，核心组件全内网隔离。
 * **🔄 平滑热更**：支持从 Web 端一键平滑重启升级，彻底免去 SSH 登录。
+* **🩺 智能就绪检测**：内置 API 健康轮询机制，确保服务 100% 启动后即可无缝访问，告别 502 报错。
 
 #### 🚀 部署方式选择
 
-你可以根据服务器的网络情况，选择以下任意一种方式进行部署：
+请根据网络环境，选择以下部署方式：
 
 **方法一：防阻断一键部署（⭐ 推荐，适用于国内服务器）**
 
-无需科学上网，只需一台干净的 Ubuntu/Debian 服务器（需 `root` 权限），直接复制并执行下方命令。系统将自动完成 Docker 安装、配置文件提取并启动服务。
+国内直连。在一台全新的 Ubuntu/Debian (需 root) 上直接执行，自动完成依赖安装与服务拉起：
 
 ```bash
 apt-get update && apt-get install -y docker.io docker-compose-v2 && \
@@ -95,9 +98,9 @@ chmod +x start-prod.sh && \
 bash start-prod.sh
 ```
 
-**方法二：常规 Github 浅克隆部署（适用于海外服务器或需保留源码）**
+**方法二：Github 浅克隆部署（适用于海外服务器 / 需保留源码）**
 
-如果你的网络环境允许直连 Github，且希望在服务器上保留项目源码，可采用常规浅拉取方式（注：需自行确保已安装 Docker 环境）：
+若网络允许直连 Github，可直接浅拉取源码运行（需系统已安装 Docker）：
 
 ```bash
 git clone --depth 1 https://github.com/owl234/ARL-Next.git && cd ARL-Next
@@ -118,15 +121,15 @@ bash start-prod.sh
 
 ### 开发环境部署 (前端本地 + Docker后端)
 
-* 👥 **适用群体**：二开人员与安全研究者。
-* ⚡ **核心优势**：前后端彻底解耦；后端全栈容器化配合代码卷热更新，前端 Vite 极速重载。
-* ⚙️ **前置条件**：已安装 [Docker Desktop](https://www.docker.com/products/docker-desktop/)、[Node.js](https://nodejs.org/)，并全局安装 `pnpm` (`npm i -g pnpm`)。
+* 👥 **适用群体**：二次开发与安全研究者。
+* ⚡ **核心优势**：前后端彻底解耦，双端热重载极速生效。
+* ⚙️ **前置条件**：本地已安装 Docker 与 Node.js (脚本会自动处理 pnpm 依赖)。
 
 #### 🚀 一键启动
 
 ```bash
 git clone https://github.com/owl234/ARL-Next && cd ARL-Next
-bash start-dev.sh # 自动拉起后端、安装前端依赖并启动服务
+bash start-dev.sh # 自动在后台拉起后端 Docker，并在前台启动 Vite 前端服务
 ```
 访问 `http://localhost:5173` 开始开发（默认凭据：`admin` / `arlpass`）。
 
@@ -139,19 +142,18 @@ bash start-dev.sh # 自动拉起后端、安装前端依赖并启动服务
 ```bash
 # 查看状态 / 实时日志 / 停止开发环境
 docker compose -f docker-compose.dev.yml ps
-docker compose -f docker-compose.dev.yml logs -f arl-web arl-worker
+docker compose -f docker-compose.dev.yml logs -f
 docker compose -f docker-compose.dev.yml down
 ```
 
 ---
 
-## 🗄️ 数据库直连 (仅限开发环境)
+## 🗄️ 数据库直连 (开发环境专用)
 
-为保证安全，生产环境默认切断了底层端口映射。开发调试期间，可使用以下配置直连排查数据：
+生产环境默认切断底层端口映射。开发时可直连排查：
 
-**🍃 MongoDB 核心数据库**
-* **直连 URI**: `mongodb://admin:admin@127.0.0.1:27018/arl?authSource=admin`
-* **拆解参数**: 端口 `27018` | 账号/密码 `admin`/`admin` | 业务库 `arl` | 认证库 `admin`
+**🍃 MongoDB**
+* **URI**: `mongodb://admin:admin@127.0.0.1:27018/arl?authSource=admin` (账密: admin)
 
 **🐇 RabbitMQ 消息队列**
 * **AMQP 端口**: `5673`
@@ -162,11 +164,21 @@ docker compose -f docker-compose.dev.yml down
 ## 📜 版本更新历史
 
 <details open>
-<summary><b>v1.1.5 (当前版本)</b></summary><br/>
+<summary><b>v1.1.6 (当前版本)</b></summary><br/>
+
+* **架构**：Puppeteer 从后台 Worker 中彻底分离为独立的 Node.js HTTP 微服务容器，大幅释放后台调度压力。
+* **性能**：重构指纹识别引擎，引入 Aho-Corasick 多模式匹配算法与内存缓存，极速提升 Web 资产扫描效率。
+* **爬虫**：优化 URL 去重算法，底层哈希池引入 Set 结构替代 List，将检索复杂度从 O(N²) 降至 O(1)，消除大规模爬取时的 CPU 瓶颈。
+* **部署**：支持 Github 浅拉取 (Shallow clone) 部署兼容；启动脚本新增 API 动态健康检测，彻底消除早期 502 报错。
+* **修复**：修复了任务列表 (Task List) 与资产侦察 (Asset Recon) 数据展示异常及状态同步问题。
+</details>
+
+<details>
+<summary><b>v1.1.5</b></summary><br/>
 
 * **架构**：重构 `icp_query` 为独立 `osint_service` 微服务，引入纯异步调度，降低主节点负载。
 * **调度**：实现轻重任务队列分离 (FOFA 等轻查询独立)，并在系统设置中支持精细化并发数配置。
-* **部署**：自动分配与挂载 2G Swap 下沉至一键部署脚本，彻底解决高并发 OOM 崩溃；Dockerfile 改用多阶段构建以缩减镜像体积。
+* **部署**：自动分配 2G Swap 解决 OOM 崩溃；多阶段构建缩减镜像体积；新增 Autoheal 容器自愈服务，自动监控并重启假死节点。
 * **安全**：热更新服务 (`updater.py`) 增设内网白名单拦截机制，阻断公网调用；修复 Nginx 与 SSE 跨域限制。
 * **功能**：任务列表新增“模糊/精确/数值”条件过滤及组合导出；核心任务层增加站点防重复插入机制。
 </details>
@@ -248,12 +260,18 @@ ARL-Next 将秉持开源互助的初心，持续为信息安全社区贡献力�
 
 ---
 
-## 💖 赞助与投喂
+## 💖 赞助与支持
 
-感谢以下开源支持者对本项目的金钱支持与投喂，你们的支持是项目持续维护与更新的动力！
+本项目的持续开发与维护离不开社区的支持。感谢以下赞助者为开源生态做出的贡献。如果你觉得本项目对你有帮助，欢迎赞助支持。
 
+<p>
+  <img src="./img/buymeacoffee.png" width="200" alt="Buy Me A Coffee" />
+</p>
 <a href="https://github.com/robotfish001">
   <img src="https://github.com/robotfish001.png" width="50" height="50" style="border-radius: 50%;" alt="robotfish-001" title="robotfish-001"/>
+</a>
+<a href="https://github.com/phpmac">
+  <img src="https://github.com/phpmac.png" width="50" height="50" style="border-radius: 50%;" alt="phpmac" title="phpmac"/>
 </a>
 
 ---

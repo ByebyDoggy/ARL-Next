@@ -15,6 +15,16 @@ class FingerPrintCache:
         self.cache = None
         self.last_update_time = 0
         self.cache_ttl = 60  # seconds
+        
+        self.ac_body = None
+        self.ac_header = None
+        self.ac_title = None
+        self.has_ahocorasick = False
+        try:
+            import ahocorasick
+            self.has_ahocorasick = True
+        except ImportError:
+            pass
 
     def is_cache_valid(self):
         return self.cache is not None
@@ -50,6 +60,30 @@ class FingerPrintCache:
             except Exception as e:
                 logger.error(f"Failed to auto-seed fingerprints: {e}")
 
+    def _build_ac_automata(self, finger_list):
+        if not self.has_ahocorasick:
+            return
+            
+        import ahocorasick
+        self.ac_body = ahocorasick.Automaton()
+        self.ac_header = ahocorasick.Automaton()
+        self.ac_title = ahocorasick.Automaton()
+        
+        for finger in finger_list:
+            if finger.parsed is None:
+                finger.build_parsed()
+                
+            for word in finger.literals['body']:
+                self.ac_body.add_word(word, word)
+            for word in finger.literals['header']:
+                self.ac_header.add_word(word, word)
+            for word in finger.literals['title']:
+                self.ac_title.add_word(word, word)
+                
+        self.ac_body.make_automaton()
+        self.ac_header.make_automaton()
+        self.ac_title.make_automaton()
+
     def fetch_data_from_mongodb(self) -> [FingerPrint]:
         self._auto_seed_if_empty()
         items = list(conn_db('fingerprint').find())
@@ -57,6 +91,12 @@ class FingerPrintCache:
         for rule in items:
             finger = FingerPrint(rule['name'], rule['human_rule'])
             finger_list.append(finger)
+
+        try:
+            self._build_ac_automata(finger_list)
+        except Exception as e:
+            logger.error(f"Failed to build AC Automata: {e}")
+            self.has_ahocorasick = False
 
         self.last_update_time = time.time()
         return finger_list
@@ -74,15 +114,42 @@ def finger_db_identify(variables: dict) -> [str]:
     finger_list = finger_db_cache.get_data()
     finger_name_list = []
 
+    matched_literals = {'body': set(), 'header': set(), 'title': set()}
+    if finger_db_cache.has_ahocorasick:
+        # scan using AC
+        for key, ac_tree in [('body', finger_db_cache.ac_body), 
+                             ('header', finger_db_cache.ac_header), 
+                             ('title', finger_db_cache.ac_title)]:
+            if key in variables and variables[key] and isinstance(variables[key], str):
+                try:
+                    for end_index, original_value in ac_tree.iter(variables[key]):
+                        matched_literals[key].add(original_value)
+                except Exception as e:
+                    pass
+
     for finger in finger_list:
         try:
+            if finger_db_cache.has_ahocorasick and not finger.has_not_or_regex:
+                skip = False
+                has_any_literals = False
+                found_any_match = False
+                
+                for key in ['body', 'header', 'title']:
+                    if finger.literals[key]:
+                        has_any_literals = True
+                        if finger.literals[key] & matched_literals[key]:
+                            found_any_match = True
+                            break
+                            
+                if has_any_literals and not found_any_match:
+                    continue  # Short circuit!
+
             if finger.identify(variables):
                 finger_name_list.append(finger.app_name)
         except Exception as e:
             logger.warning("error on identify {} {}".format(finger.app_name, e))
 
     return finger_name_list
-
 
 def have_human_rule_from_db(rule: str) -> bool:
     query = {
@@ -93,4 +160,5 @@ def have_human_rule_from_db(rule: str) -> bool:
         return True
     else:
         return False
+
 

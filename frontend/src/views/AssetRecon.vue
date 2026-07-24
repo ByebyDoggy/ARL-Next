@@ -316,7 +316,7 @@ const tycFormState = reactive({
   name: "",
   gid: "",
   depth: 0,
-  query_type: []
+  query_type: ['invest']
 });
 
 const tycConfigCheck = reactive({

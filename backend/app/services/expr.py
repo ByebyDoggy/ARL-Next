@@ -45,11 +45,18 @@ bool_expr = infixNotation(
 )
 
 
+from functools import lru_cache
+
+@lru_cache(maxsize=150000)
+def get_compiled_pattern(pattern):
+    return re.compile(pattern, re.IGNORECASE)
+
 # 定义操作符
 def safe_regex_match(x, pattern):
     try:
         clean_pat = pattern.strip('"')
-        return bool(re.search(clean_pat, str(x), re.IGNORECASE))
+        compiled_pat = get_compiled_pattern(clean_pat)
+        return bool(compiled_pat.search(str(x)))
     except Exception:
         return False
 

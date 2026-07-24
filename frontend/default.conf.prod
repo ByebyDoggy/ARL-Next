@@ -50,7 +50,6 @@ server {
 
     # 2. 动态 API 反向代理
     location /api/ {
-        auth_basic off; # API 采用自带 Token 鉴权，关闭基础认证避免拦截脚本和 MCP 服务
         proxy_pass http://arl-web:5000/api/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
