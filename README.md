@@ -84,7 +84,7 @@ ARL-Next 采用前后端解耦的微服务架构，核心模块如下：
 国内直连。在一台全新的 Ubuntu/Debian (需 root) 上直接执行，自动完成依赖安装与服务拉起：
 
 ```bash
-apt-get update && apt-get install -y docker.io docker-compose-v2 && \
+apt-get update && apt-get install -y docker.io docker-compose-v2 openssl curl && \
 mkdir -p ~/ARL-Next && cd ~/ARL-Next && \
 docker pull crpi-laul1izptqrf0tkf.cn-beijing.personal.cr.aliyuncs.com/owl234-arl-prod/arl-web:latest && \
 docker rm -f arl-temp 2>/dev/null || true && \
