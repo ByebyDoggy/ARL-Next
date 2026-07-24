@@ -185,12 +185,12 @@ async function takeScreenshot(url) {
 
             await page.setViewport({ width: 1024, height: 768 });
 
-            const gotoPromise = page.goto(url, { waitUntil: 'networkidle2', timeout: 8000 });
+            const gotoPromise = page.goto(url, { waitUntil: 'load', timeout: 15000 });
             gotoPromise.catch(() => {});
             
             let gotoTimeoutId;
             const timeoutPromise = new Promise((_, reject) => {
-                gotoTimeoutId = setTimeout(() => reject(new Error('Goto Hard Timeout')), 8000);
+                gotoTimeoutId = setTimeout(() => reject(new Error('Goto Hard Timeout')), 15000);
             });
             
             try {
@@ -201,7 +201,7 @@ async function takeScreenshot(url) {
                 clearTimeout(gotoTimeoutId);
             }
             
-            await new Promise(r => setTimeout(r, 1000));
+            await new Promise(r => setTimeout(r, 3000));
 
             let height = 768;
             try {
@@ -239,10 +239,26 @@ async function takeScreenshot(url) {
                 clearTimeout(evalTimeoutId); 
             } catch (evalErr) {
                 console.error(`Evaluate warning [${url}]:`, evalErr.message);
+                height = 768;
             }
 
-            await page.setViewport({ width: 1024, height: height });
-            const base64 = await page.screenshot({ type: 'jpeg', quality: 30, encoding: 'base64' });
+            try {
+                await page.setViewport({ width: 1024, height: height });
+            } catch(vpErr) {}
+            
+            let base64 = null;
+            try {
+                base64 = await page.screenshot({ type: 'jpeg', quality: 30, encoding: 'base64' });
+            } catch (ssErr) {
+                console.error(`Screenshot error [${url}]:`, ssErr.message);
+                await new Promise(r => setTimeout(r, 1000));
+                try {
+                    await page.setViewport({ width: 1024, height: 768 });
+                    base64 = await page.screenshot({ type: 'jpeg', quality: 30, encoding: 'base64', clip: {x: 0, y: 0, width: 1024, height: 768} });
+                } catch (ssErr2) {
+                    console.error(`Screenshot fallback error [${url}]:`, ssErr2.message);
+                }
+            }
             cleanupAndResolve(base64);
         } catch (e) {
             console.error(`Screenshot error [${url}]:`, e.message);

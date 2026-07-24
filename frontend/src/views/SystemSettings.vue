@@ -1511,8 +1511,40 @@ const checkVersion = async () => {
       }
     }
       
-    if (localVersion.value && localVersion.value !== remoteVersion.value && localVersion.value !== '未知版本') {
-      hasNewVersion.value = true;
+    if (localVersion.value && localVersion.value !== '未知版本' && remoteVersion.value) {
+      // 检查 remote 是否大于 local
+      const isGreater = (v1, v2) => {
+        const cleanV1 = v1.replace(/^v/, '');
+        const cleanV2 = v2.replace(/^v/, '');
+        
+        const [base1, suffix1] = cleanV1.split('-');
+        const [base2, suffix2] = cleanV2.split('-');
+        
+        const parts1 = base1.split('.').map(Number);
+        const parts2 = base2.split('.').map(Number);
+        
+        for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+          const num1 = parts1[i] || 0;
+          const num2 = parts2[i] || 0;
+          if (num1 > num2) return true;
+          if (num1 < num2) return false;
+        }
+        
+        // 基础版本号相同，比较后缀
+        if (suffix1 && !suffix2) return true;
+        if (!suffix1 && suffix2) return false;
+        
+        if (suffix1 && suffix2) {
+          const num1 = parseInt((suffix1.match(/\d+/) || [0])[0], 10);
+          const num2 = parseInt((suffix2.match(/\d+/) || [0])[0], 10);
+          if (num1 !== num2) return num1 > num2;
+          return suffix1 > suffix2;
+        }
+        
+        return false;
+      };
+      
+      hasNewVersion.value = isGreater(remoteVersion.value, localVersion.value);
     }
   } catch (e) {
     console.error('检查版本失败', e);
