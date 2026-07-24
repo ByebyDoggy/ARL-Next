@@ -60,8 +60,6 @@ services:
     restart: always
     command: bash -c "export NODE_PATH=/usr/local/lib/node_modules && node /code/backend/app/tools/puppeteer_server.js"
     working_dir: /code
-    volumes:
-      - ./backend/app/tools/puppeteer_server.js:/code/backend/app/tools/puppeteer_server.js
     environment:
       - TZ=Asia/Shanghai
     networks:
