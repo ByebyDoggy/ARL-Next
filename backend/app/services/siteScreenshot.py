@@ -2,15 +2,18 @@ import os
 import re
 import time
 import json
-import tempfile
+import base64
+import requests
 from app import utils
 from app.config import Config
+from .baseThread import BaseThread
 logger = utils.get_logger()
 
-class SiteScreenshot:
+PUPPETEER_URL = os.environ.get("PUPPETEER_URL", "http://arl-puppeteer:5005")
+
+class SiteScreenshot(BaseThread):
     def __init__(self, sites, concurrency=3, capture_dir="./"):
-        self.targets = sites
-        self.concurrency = concurrency
+        super().__init__(sites, concurrency=concurrency)
         self.capture_dir = capture_dir
         self.screenshot_map = {}
         os.makedirs(self.capture_dir, 0o777, True)
@@ -18,38 +21,47 @@ class SiteScreenshot:
     def gen_filename(self, site):
         filename = site.replace('://', '_')
         return re.sub(r'[^\w\-_\. ]', '_', filename)
+        
+    def work(self, site):
+        file_name = '{}/{}.jpg'.format(self.capture_dir, self.gen_filename(site))
+        self.screenshot_map[site] = file_name
+        
+        logger.debug("SiteScreenshot HTTP => {}".format(site))
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                res = requests.post(f"{PUPPETEER_URL}/screenshot", json={"url": site}, timeout=45)
+                if res.status_code == 200:
+                    data = res.json()
+                    if data.get("base64"):
+                        img_data = base64.b64decode(data["base64"])
+                        with open(file_name, "wb") as f:
+                            f.write(img_data)
+                    return
+                elif res.status_code == 503:
+                    logger.warning("SiteScreenshot HTTP 503 for {}, server is restarting. Retrying in 10s...".format(site))
+                    time.sleep(10)
+                    continue
+                else:
+                    logger.warning("SiteScreenshot HTTP Error {} for {}".format(res.status_code, site))
+                    return
+            except requests.exceptions.ConnectionError:
+                logger.warning("SiteScreenshot ConnectionError for {}. Retrying in 5s...".format(site))
+                time.sleep(5)
+                continue
+            except Exception as e:
+                logger.warning("SiteScreenshot failed for {}: {}".format(site, e))
+                return
+        
+        logger.error("SiteScreenshot failed for {} after {} retries.".format(site, max_retries))
 
     def run(self):
         t1 = time.time()
         logger.info("start screen shot batch, total: {}".format(len(self.targets)))
         if not self.targets:
             return
-
-        tasks = []
-        for site in self.targets:
-            file_name = '{}/{}.jpg'.format(self.capture_dir, self.gen_filename(site))
-            self.screenshot_map[site] = file_name
-            tasks.append({
-                "url": site,
-                "save_name": file_name
-            })
             
-        # [防卫性补丁 3]：显式指定强编码 utf-8，防止精简系统下 UnicodeEncodeError
-        with tempfile.NamedTemporaryFile('w', encoding='utf-8', delete=False, suffix='.json') as f:
-            json.dump({"concurrency": self.concurrency, "tasks": tasks}, f)
-            tmp_path = f.name
-            
-        batch_timeout = int(len(self.targets) / self.concurrency * 20 + 60)
-        cmd_parameters = ['node', os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'tools', 'screenshot_pptr.js'), '--file={}'.format(tmp_path)]
-        logger.debug("screenshot batch {}".format(" ".join(cmd_parameters)))
-
-        try:
-            utils.exec_system(cmd_parameters, timeout=batch_timeout)
-        except Exception as e:
-            logger.error("screenshot batch error: {}".format(e))
-        finally:
-            if os.path.exists(tmp_path):
-                os.remove(tmp_path)
+        self._run()
 
         elapse = time.time() - t1
         logger.info("end screen shot batch elapse {:.2f}s".format(elapse))

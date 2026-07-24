@@ -140,6 +140,117 @@ function analyzeUrl(url) {
     });
 }
 
+async function takeScreenshot(url) {
+    return new Promise(async (resolve, reject) => {
+        let page;
+        let context;
+        let timeoutId;
+
+        const cleanupAndResolve = async (base64) => {
+            if (timeoutId) clearTimeout(timeoutId);
+            if (page) await page.close().catch(() => true);
+            if (context) await context.close().catch(() => true);
+            resolve({ url: url, base64: base64 || null });
+        };
+
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            console.error(`[Security Block] Invalid protocol for URL: ${url}`);
+            resolve({ url: url, base64: null });
+            return;
+        }
+
+        timeoutId = setTimeout(() => {
+            console.log(`[Screenshot Timeout] 25s limit reached for ${url}`);
+            cleanupAndResolve(null);
+        }, 25000);
+        
+        try {
+            context = await browser.createIncognitoBrowserContext();
+            page = await context.newPage();
+            
+            page.on('dialog', async dialog => {
+                await dialog.dismiss().catch(() => {});
+            });
+
+            await page.setRequestInterception(true);
+            page.on('request', (req) => {
+                if (req.isInterceptResolutionHandled && req.isInterceptResolutionHandled()) return;
+                const rt = req.resourceType();
+                if (['media', 'font', 'websocket', 'manifest'].includes(rt)) {
+                    req.abort().catch(() => {});
+                } else {
+                    req.continue().catch(() => {});
+                }
+            });
+
+            await page.setViewport({ width: 1024, height: 768 });
+
+            const gotoPromise = page.goto(url, { waitUntil: 'networkidle2', timeout: 8000 });
+            gotoPromise.catch(() => {});
+            
+            let gotoTimeoutId;
+            const timeoutPromise = new Promise((_, reject) => {
+                gotoTimeoutId = setTimeout(() => reject(new Error('Goto Hard Timeout')), 8000);
+            });
+            
+            try {
+                await Promise.race([gotoPromise, timeoutPromise]);
+            } catch (gotoErr) {
+                console.error(`Goto warning [${url}]:`, gotoErr.message);
+            } finally {
+                clearTimeout(gotoTimeoutId);
+            }
+            
+            await new Promise(r => setTimeout(r, 1000));
+
+            let height = 768;
+            try {
+                const evalPromise = page.evaluate(() => {
+                    if (document.body) { document.body.style.backgroundColor = 'white'; }
+                    try {
+                        let style = document.createElement('style');
+                        style.innerHTML = 'html, body { height: auto !important; overflow: visible !important; min-height: 100% !important; }';
+                        document.head.appendChild(style);
+                    } catch(e) {}
+                    
+                    let maxH = 768;
+                    try {
+                        maxH = Math.max(
+                            document.body ? document.body.scrollHeight : 768,
+                            document.documentElement ? document.documentElement.scrollHeight : 768,
+                            document.body ? document.body.offsetHeight : 768,
+                            document.documentElement ? document.documentElement.offsetHeight : 768,
+                            document.body ? document.body.clientHeight : 768,
+                            document.documentElement ? document.documentElement.clientHeight : 768
+                        );
+                    } catch(e) {}
+                    
+                    return maxH > 2048 ? 2048 : (maxH < 768 ? 768 : maxH);
+                });
+                evalPromise.catch(() => {}); 
+                
+                let evalTimeoutId;
+                const evalTimeout = new Promise((_, reject) => {
+                    evalTimeoutId = setTimeout(() => reject(new Error('Evaluate Timeout')), 5000);
+                });
+                
+                height = await Promise.race([evalPromise, evalTimeout]);
+                if (typeof height !== 'number') height = 768;
+                clearTimeout(evalTimeoutId); 
+            } catch (evalErr) {
+                console.error(`Evaluate warning [${url}]:`, evalErr.message);
+            }
+
+            await page.setViewport({ width: 1024, height: height });
+            const base64 = await page.screenshot({ type: 'jpeg', quality: 30, encoding: 'base64' });
+            cleanupAndResolve(base64);
+        } catch (e) {
+            console.error(`Screenshot error [${url}]:`, e.message);
+            cleanupAndResolve(null);
+        }
+    });
+}
+
 let requestsCount = 0;
 let activeRequests = 0;
 let isShuttingDown = false;
@@ -180,7 +291,13 @@ const server = http.createServer(async (req, res) => {
                     return;
                 }
                 
-                const result = await analyzeUrl(url);
+                let result;
+                if (req.url === '/screenshot') {
+                    result = await takeScreenshot(url);
+                } else {
+                    result = await analyzeUrl(url);
+                }
+                
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(result));
                 
