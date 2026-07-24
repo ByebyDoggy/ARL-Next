@@ -21,5 +21,7 @@ RUN npm install -g puppeteer-core@10.4.0 pm2 && \
 
 WORKDIR /code
 COPY ./app/tools/puppeteer_server.js /code/backend/app/tools/puppeteer_server.js
+COPY ./app/tools/wappalyzer.js /code/backend/app/tools/wappalyzer.js
+COPY ./app/tools/apps.json /code/backend/app/tools/apps.json
 
 CMD ["node", "/code/backend/app/tools/puppeteer_server.js"]
