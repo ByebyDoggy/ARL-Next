@@ -122,8 +122,15 @@
         </template>
 
         <template v-else-if="column.key === 'target'">
-          <a-tooltip :title="record.target" placement="topLeft">
-            <div style="width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          <a-tooltip placement="topLeft">
+            <template #title>
+              <div style="word-break: break-all; max-height: 300px; overflow-y: auto;">
+                <div v-for="(item, index) in (Array.isArray(record.target) ? record.target : String(record.target).split(/[,\s]+/)).filter(Boolean)" :key="index">
+                  {{ item.trim() }}
+                </div>
+              </div>
+            </template>
+            <div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
               {{ record.target }}
             </div>
           </a-tooltip>

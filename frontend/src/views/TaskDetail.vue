@@ -1,10 +1,22 @@
 <template>
   <div style="background-color: var(--arl-bg-layout); padding: 24px; min-height: calc(100vh - 64px);">
     <a-page-header
-      :title="`${targetName} 相关资产`"
       @back="() => router.back()"
       style="padding: 0 0 24px 0;"
-    />
+    >
+      <template #title>
+        <a-tooltip placement="bottomLeft">
+          <template #title>
+            <div style="word-break: break-all; max-height: 300px; overflow-y: auto; font-weight: normal; font-size: 14px;">
+              <div v-for="(item, index) in targetList" :key="index">
+                {{ item }}
+              </div>
+            </div>
+          </template>
+          <span>{{ displayTitle }}</span>
+        </a-tooltip>
+      </template>
+    </a-page-header>
 
     <a-tabs v-model:activeKey="activeTab" type="card" class="arl-detail-tabs">
       <a-tab-pane key="site" :tab="query.task_id ? `站点 - ${queryCounts.site}` : '站点'"></a-tab-pane>
@@ -145,6 +157,19 @@
               <span class="add-tag">添加标签</span>
             </div>
           </div>
+        </template>
+
+        <template v-else-if="column.key === 'title'">
+          <a-tooltip placement="topLeft" :overlayStyle="{ maxWidth: '400px' }">
+            <template #title>
+              <div style="word-break: break-all;">
+                {{ record.title }}
+              </div>
+            </template>
+            <div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              {{ record.title }}
+            </div>
+          </a-tooltip>
         </template>
 
         <template v-else-if="column.key === 'headers'">
@@ -365,6 +390,18 @@
           <template v-else-if="column.key === 'site'">
             <a :href="record.site || record.url" target="_blank">{{ record.site || record.url }}</a>
           </template>
+          <template v-else-if="column.key === 'title'">
+            <a-tooltip placement="topLeft" :overlayStyle="{ maxWidth: '400px' }">
+              <template #title>
+                <div style="word-break: break-all;">
+                  {{ record.title }}
+                </div>
+              </template>
+              <div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                {{ record.title }}
+              </div>
+            </a-tooltip>
+          </template>
         </template>
       </a-table>
     </a-modal>
@@ -487,6 +524,14 @@ const openFingerModal = async (fingerName) => {
   }
 };
 const targetName = ref(query.targetName || '未知目标');
+const targetList = computed(() => {
+  return String(targetName.value).split(/[,\s]+/).filter(Boolean);
+});
+const displayTitle = computed(() => {
+  const list = targetList.value;
+  if (list.length <= 1) return `${targetName.value} 相关资产`;
+  return `${list[0]} 等 ${list.length} 个目标相关资产`;
+});
 const activeTab = ref('site');
 const loading = ref(false);
 const dataSource = ref([]);

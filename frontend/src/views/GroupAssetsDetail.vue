@@ -142,6 +142,24 @@
           </div>
         </template>
 
+        <template v-else-if="column.key === 'screenshot'">
+          <img v-if="record.screenshot" :src="`/api${record.screenshot}`" style="width: 280px; height: 160px; object-fit: cover; object-position: top; cursor: pointer; border: 1px solid var(--arl-border-color); border-radius: 4px;" @click="handlePreview(`/api${record.screenshot}`)" />
+          <span v-else>-</span>
+        </template>
+
+        <template v-else-if="column.key === 'title'">
+          <a-tooltip placement="topLeft" :overlayStyle="{ maxWidth: '400px' }">
+            <template #title>
+              <div style="word-break: break-all;">
+                {{ record.title }}
+              </div>
+            </template>
+            <div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              {{ record.title }}
+            </div>
+          </a-tooltip>
+        </template>
+
         <template v-else-if="column.key === 'headers'"><div class="scroll-x"><pre>{{ record.headers }}</pre></div></template>
         <template v-else-if="column.key === 'finger'">
           <div v-if="record.finger && record.finger.length > 0" style="display: flex; flex-wrap: wrap; gap: 4px;">
@@ -263,8 +281,25 @@
           <template v-else-if="column.key === 'site'">
             <a :href="record.site || record.url" target="_blank">{{ record.site || record.url }}</a>
           </template>
+          <template v-else-if="column.key === 'title'">
+            <a-tooltip placement="topLeft" :overlayStyle="{ maxWidth: '400px' }">
+              <template #title>
+                <div style="word-break: break-all;">
+                  {{ record.title }}
+                </div>
+              </template>
+              <div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                {{ record.title }}
+              </div>
+            </a-tooltip>
+          </template>
         </template>
       </a-table>
+    </a-modal>
+
+    <!-- 图片预览组件 -->
+    <a-modal v-model:open="previewVisible" :footer="null" width="85vw" centered @cancel="previewVisible = false" :bodyStyle="{ padding: '16px' }">
+      <img :src="previewImage" style="width: 100%; max-height: 85vh; object-fit: contain; display: block;" />
     </a-modal>
 
 
@@ -339,6 +374,10 @@ const targetName = computed(() => route.query.targetName || '未知资产');
 const activeTab = ref('site');
 const loading = ref(false);
 const dataSource = ref([]);
+
+const previewVisible = ref(false);
+const previewImage = ref('');
+const handlePreview = (url) => { previewImage.value = url; previewVisible.value = true; };
 const searchForm = ref({});
 const pagination = reactive({ current: 1, pageSize: 10, total: 0 });
 
@@ -410,7 +449,8 @@ const tabConfig = {
       { title: '标题', dataIndex: 'title', key: 'title', width: 200 },
       { title: 'headers', key: 'headers', width: 400 },
       { title: 'finger', key: 'finger', width: 150 },
-      { title: '更新时间', dataIndex: 'update_date', key: 'update_date', width: 180 } // 修正字段名
+      { title: '更新时间', dataIndex: 'update_date', key: 'update_date', width: 180 }, // 修正字段名
+      { title: '截图', key: 'screenshot', width: 300 }
     ]
   },
   domain: {

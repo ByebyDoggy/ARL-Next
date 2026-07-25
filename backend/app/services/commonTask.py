@@ -65,14 +65,26 @@ class CommonTask(object):
             return
 
         related_scope_id = options.get("related_scope_id", "")
-        if not related_scope_id:
+        if not related_scope_id or len(related_scope_id) != 24:
+            self._push_task_result_only()
             return
 
-        if len(related_scope_id) != 24:
-            logger.warning("related_scope_id len not eq 24 {}".format(self.task_id, related_scope_id))
-            return
+        services.sync_asset(task_id=self.task_id, scope_id=related_scope_id, push_flag=True)
 
-        services.sync_asset(task_id=self.task_id, scope_id=related_scope_id)
+    def _push_task_result_only(self):
+        asset_map = {"domain": [], "ip": [], "site": [], "task_name": ""}
+        asset_counter = {"domain": 0, "ip": 0, "site": 0}
+
+        task_info = utils.conn_db('task').find_one({"_id": ObjectId(self.task_id)})
+        if task_info:
+            asset_map["task_name"] = task_info.get("name", "")
+
+        for category in ["domain", "ip", "site"]:
+            items = list(utils.conn_db(category).find({"task_id": self.task_id}))
+            asset_counter[category] = len(items)
+            asset_map[category] = items[:10]
+
+        utils.message_push(asset_map=asset_map, asset_counter=asset_counter)
 
     def common_run(self):
         self.insert_finger_stat()

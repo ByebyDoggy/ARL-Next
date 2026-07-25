@@ -93,94 +93,116 @@ class Push(object):
         return site_info_list
 
     def _push_dingding(self):
-        tpl = ""
-        if self.domain_len > 0:
-            tpl = "[{}]新发现域名 `{}` , 站点 `{}`\n***\n".format(self.task_name, self.domain_len, self.site_len)
-            tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.domain_info_list))
+        if self.domain_len == 0 and self.ip_len == 0 and self.site_len == 0:
+            tpl = "[{}] 任务已完成，本次无新增资产。\n".format(self.task_name)
+        else:
+            tpl = ""
+            if self.domain_len > 0:
+                tpl = "[{}]新发现域名 `{}` , 站点 `{}`\n***\n".format(self.task_name, self.domain_len, self.site_len)
+                tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.domain_info_list))
 
-        if self.ip_len > 0:
-            tpl = "[{}]新发现 IP `{}` , 站点 `{}`\n***\n".format(self.task_name, self.ip_len, self.site_len)
-            tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.ip_info_list))
+            if self.ip_len > 0:
+                tpl = "[{}]新发现 IP `{}` , 站点 `{}`\n***\n".format(self.task_name, self.ip_len, self.site_len)
+                tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.ip_info_list))
 
-        tpl += "\n***\n"
-        tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.site_info_list))
+            tpl += "\n***\n"
+            tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.site_info_list))
+            
         ding_out = dingding_send(msg=tpl, access_token=Config.DINGDING_ACCESS_TOKEN,
                                  secret=Config.DINGDING_SECRET, msgtype="markdown")
-        if ding_out["errcode"] != 0:
+        if ding_out.get("errcode", 0) != 0:
             logger.warning("发送失败 \n{}\n {}".format(tpl, ding_out))
             return False
         return True
 
     def _push_wx_work(self):
-        tpl = ""
-        if self.domain_len > 0:
-            tpl = "[{}]新发现域名 `{}` , 站点 `{}`\n".format(self.task_name, self.domain_len, self.site_len)
-            tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.domain_info_list))
+        if self.domain_len == 0 and self.ip_len == 0 and self.site_len == 0:
+            tpl = "[{}] 任务已完成，本次无新增资产。\n".format(self.task_name)
+        else:
+            tpl = ""
+            if self.domain_len > 0:
+                tpl = "[{}]新发现域名 `{}` , 站点 `{}`\n".format(self.task_name, self.domain_len, self.site_len)
+                tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.domain_info_list))
 
-        if self.ip_len > 0:
-            tpl = "[{}]新发现 IP `{}` , 站点 `{}`\n".format(self.task_name, self.ip_len, self.site_len)
-            tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.ip_info_list))
+            if self.ip_len > 0:
+                tpl = "[{}]新发现 IP `{}` , 站点 `{}`\n".format(self.task_name, self.ip_len, self.site_len)
+                tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.ip_info_list))
 
-        tpl += "\n"
-        tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.site_info_list))
+            tpl += "\n"
+            tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.site_info_list))
+            
         ding_out = wx_work_send(msg=tpl, webhook_url=Config.WX_WORK_WEBHOOK)
-        if ding_out["errcode"] != 0:
+        if ding_out.get("errcode", 0) != 0:
             logger.warning("发送失败 \n{}\n {}".format(tpl, ding_out))
             return False
         return True
 
     def _push_feishu(self):
-        tpl = ""
-        if self.domain_len > 0:
-            tpl = "[{}]新发现域名 {}, 站点 {}\n".format(self.task_name, self.domain_len, self.site_len)
-            tpl = "{}{}".format(tpl, dict2dingding_mark(self.domain_info_list))
+        if self.domain_len == 0 and self.ip_len == 0 and self.site_len == 0:
+            tpl = "[{}] 任务已完成，本次无新增资产。\n".format(self.task_name)
+        else:
+            tpl = ""
+            if self.domain_len > 0:
+                tpl = "[{}]新发现域名 {}, 站点 {}\n".format(self.task_name, self.domain_len, self.site_len)
+                tpl = "{}{}".format(tpl, dict2dingding_mark(self.domain_info_list))
 
-        if self.ip_len > 0:
-            tpl = "[{}]新发现 IP {}, 站点{}\n".format(self.task_name, self.ip_len, self.site_len)
-            tpl = "{}{}".format(tpl, dict2dingding_mark(self.ip_info_list))
+            if self.ip_len > 0:
+                tpl = "[{}]新发现 IP {}, 站点{}\n".format(self.task_name, self.ip_len, self.site_len)
+                tpl = "{}{}".format(tpl, dict2dingding_mark(self.ip_info_list))
 
-        tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.site_info_list))
+            tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.site_info_list))
+            
         feishu_out = feishu_send(msg=tpl, webhook_url=Config.FEISHU_WEBHOOK,
                                  secret=Config.FEISHU_SECRET)
-        if feishu_out["code"] != 0:
+        if feishu_out.get("code", 0) != 0:
             logger.warning("发送失败 \n{}\n {}".format(tpl[:50], feishu_out))
             return False
         return True
 
     def _push_telegram(self):
-        tpl = ""
-        if self.domain_len > 0:
-            tpl = "[{}]新发现域名 {}, 站点 {}\n".format(self.task_name, self.domain_len, self.site_len)
-            tpl = "{}{}".format(tpl, dict2dingding_mark(self.domain_info_list))
+        if self.domain_len == 0 and self.ip_len == 0 and self.site_len == 0:
+            tpl = "[{}] 任务已完成，本次无新增资产。\n".format(self.task_name)
+        else:
+            tpl = ""
+            if self.domain_len > 0:
+                tpl = "[{}]新发现域名 {}, 站点 {}\n".format(self.task_name, self.domain_len, self.site_len)
+                tpl = "{}{}".format(tpl, dict2dingding_mark(self.domain_info_list))
 
-        if self.ip_len > 0:
-            tpl = "[{}]新发现 IP {}, 站点{}\n".format(self.task_name, self.ip_len, self.site_len)
-            tpl = "{}{}".format(tpl, dict2dingding_mark(self.ip_info_list))
+            if self.ip_len > 0:
+                tpl = "[{}]新发现 IP {}, 站点{}\n".format(self.task_name, self.ip_len, self.site_len)
+                tpl = "{}{}".format(tpl, dict2dingding_mark(self.ip_info_list))
 
-        tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.site_info_list))
+            tpl = "{}\n{}".format(tpl, dict2dingding_mark(self.site_info_list))
+            
         try:
-            telegram_send(f"*{self.task_name}*\n\n{tpl}", bot_token=Config.TG_BOT_TOKEN, chat_id=Config.TG_CHAT_ID)
+            tg_out = telegram_send(f"*{self.task_name}*\n\n{tpl}", bot_token=Config.TG_BOT_TOKEN, chat_id=Config.TG_CHAT_ID)
+            if not tg_out.get("ok"):
+                logger.warning("Telegram发送失败 \n{}\n {}".format(tpl[:50], tg_out))
+                return False
             return True
         except Exception as e:
-            logger.warning("Telegram发送失败 \n{}\n {}".format(tpl[:50], str(e)))
+            logger.warning("Telegram发送异常 \n{}\n {}".format(tpl[:50], str(e)))
             return False
 
     def _push_email(self):
-        html = ""
-        if self.domain_len > 0:
-            tpl = "<div> 新发现域名 {}, 站点 {}\n</div>".format(self.domain_len, self.site_len)
-            html = tpl
-            html += "<br/>"
-            html += dict2table(self.domain_info_list)
+        if self.domain_len == 0 and self.ip_len == 0 and self.site_len == 0:
+            html = "<div> [{}] 任务已完成，本次无新增资产。</div>".format(self.task_name)
+        else:
+            html = ""
+            if self.domain_len > 0:
+                tpl = "<div> 新发现域名 {}, 站点 {}\n</div>".format(self.domain_len, self.site_len)
+                html += tpl
+                html += "<br/>"
+                html += dict2table(self.domain_info_list)
 
-        if self.ip_len > 0:
-            tpl = "<div> 新发现 IP {}, 站点 {}\n</div>".format(self.ip_len, self.site_len)
-            html = tpl
-            html += "<br/>"
-            html += dict2table(self.ip_info_list)
+            if self.ip_len > 0:
+                tpl = "<div> 新发现 IP {}, 站点 {}\n</div>".format(self.ip_len, self.site_len)
+                html += tpl
+                html += "<br/>"
+                html += dict2table(self.ip_info_list)
 
-        html += "<br/><br/>"
-        html += dict2table(self.site_info_list)
+            html += "<br/><br/>"
+            html += dict2table(self.site_info_list)
 
         title = "[{}] 灯塔消息推送".format(self.task_name[:50])
         send_email(host=Config.EMAIL_HOST, port=Config.EMAIL_PORT, mail=Config.EMAIL_USERNAME,
@@ -256,14 +278,18 @@ def unified_push(push_type: str, title: str, content: str):
     # 钉钉
     if Config.DINGDING_ACCESS_TOKEN and Config.DINGDING_SECRET:
         try:
-            dingding_send(content, Config.DINGDING_ACCESS_TOKEN, Config.DINGDING_SECRET, msgtype="markdown", title=title)
+            res = dingding_send(content, Config.DINGDING_ACCESS_TOKEN, Config.DINGDING_SECRET, msgtype="markdown", title=title)
+            if res.get("errcode", 0) != 0:
+                logger.warning(f"unified_push dingding api error: {res}")
         except Exception as e:
             logger.warning(f"unified_push dingding error: {e}")
             
     # 飞书
     if Config.FEISHU_WEBHOOK and Config.FEISHU_SECRET:
         try:
-            feishu_send(content, Config.FEISHU_WEBHOOK, Config.FEISHU_SECRET, title=title)
+            res = feishu_send(content, Config.FEISHU_WEBHOOK, Config.FEISHU_SECRET, title=title)
+            if res.get("code", 0) != 0:
+                logger.warning(f"unified_push feishu api error: {res}")
         except Exception as e:
             logger.warning(f"unified_push feishu error: {e}")
             
@@ -271,7 +297,9 @@ def unified_push(push_type: str, title: str, content: str):
     if Config.WX_WORK_WEBHOOK:
         try:
             wx_content = f"**{title}**\n\n{content}"
-            wx_work_send(wx_content, Config.WX_WORK_WEBHOOK)
+            res = wx_work_send(wx_content, Config.WX_WORK_WEBHOOK)
+            if res.get("errcode", 0) != 0:
+                logger.warning(f"unified_push wx_work api error: {res}")
         except Exception as e:
             logger.warning(f"unified_push wx_work error: {e}")
             
@@ -289,7 +317,9 @@ def unified_push(push_type: str, title: str, content: str):
     tg_chat = getattr(Config, 'TG_CHAT_ID', None)
     if tg_token and tg_chat:
         try:
-            telegram_send(f"*{title}*\n\n{content}", tg_token, tg_chat)
+            res = telegram_send(f"*{title}*\n\n{content}", tg_token, tg_chat)
+            if not res.get("ok"):
+                logger.warning(f"unified_push telegram api error: {res}")
         except Exception as e:
             logger.warning(f"unified_push telegram error: {e}")
 

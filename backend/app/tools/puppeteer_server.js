@@ -45,6 +45,13 @@ function analyzeUrl(url) {
             // Create a new incognito context for isolation
             context = await browser.createIncognitoBrowserContext();
             page = await context.newPage();
+            
+            // Bypass WAF by mocking User-Agent and webdriver
+            await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+            await page.evaluateOnNewDocument(() => {
+                Object.defineProperty(navigator, 'webdriver', { get: () => false });
+            });
+
             await page.setViewport({ width: 1280, height: 1024 });
 
             // Resource blocking to save CPU and Bandwidth
@@ -167,6 +174,12 @@ async function takeScreenshot(url) {
         try {
             context = await browser.createIncognitoBrowserContext();
             page = await context.newPage();
+            
+            // Bypass WAF by mocking User-Agent and webdriver
+            await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+            await page.evaluateOnNewDocument(() => {
+                Object.defineProperty(navigator, 'webdriver', { get: () => false });
+            });
             
             page.on('dialog', async dialog => {
                 await dialog.dismiss().catch(() => {});

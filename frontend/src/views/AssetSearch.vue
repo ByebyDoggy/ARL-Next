@@ -139,6 +139,19 @@
           </div>
         </template>
 
+        <template v-else-if="column.key === 'title'">
+          <a-tooltip placement="topLeft" :overlayStyle="{ maxWidth: '400px' }">
+            <template #title>
+              <div style="word-break: break-all;">
+                {{ record.title }}
+              </div>
+            </template>
+            <div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              {{ record.title }}
+            </div>
+          </a-tooltip>
+        </template>
+
         <template v-else-if="column.key === 'headers'">
           <div class="scroll-x"><pre>{{ record.headers }}</pre></div>
         </template>
@@ -386,6 +399,18 @@
           <template v-if="column.key === 'index'">{{ index + 1 }}</template>
           <template v-else-if="column.key === 'site'">
             <a :href="record.site || record.url" target="_blank">{{ record.site || record.url }}</a>
+          </template>
+          <template v-else-if="column.key === 'title'">
+            <a-tooltip placement="topLeft" :overlayStyle="{ maxWidth: '400px' }">
+              <template #title>
+                <div style="word-break: break-all;">
+                  {{ record.title }}
+                </div>
+              </template>
+              <div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                {{ record.title }}
+              </div>
+            </a-tooltip>
           </template>
         </template>
       </a-table>
