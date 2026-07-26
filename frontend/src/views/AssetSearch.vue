@@ -3,26 +3,26 @@
 
         <a-tabs v-model:activeKey="activeTab" type="card" class="arl-detail-tabs">
       <a-tab-pane key="site" tab="站点"></a-tab-pane>
-      <a-tab-pane key="domain" tab="子域�?></a-tab-pane>
+      <a-tab-pane key="domain" tab="子域名"></a-tab-pane>
       <a-tab-pane key="ip" tab="IP"></a-tab-pane>
       <a-tab-pane key="cert" tab="SSL证书"></a-tab-pane>
       <a-tab-pane key="service" tab="服务"></a-tab-pane>
       <a-tab-pane key="fileleak" tab="文件泄露"></a-tab-pane>
       <a-tab-pane key="url" tab="URL信息"></a-tab-pane>
       <a-tab-pane key="vuln" tab="风险"></a-tab-pane>
-      <a-tab-pane key="npoc_service" tab="服务（python�?></a-tab-pane>
-      <a-tab-pane key="cip" tab="C�?></a-tab-pane>
+      <a-tab-pane key="npoc_service" tab="服务（python）"></a-tab-pane>
+      <a-tab-pane key="cip" tab="C段"></a-tab-pane>
       <a-tab-pane key="nuclei_result" tab="nuclei"></a-tab-pane>
       <a-tab-pane key="stat_finger" tab="指纹统计"></a-tab-pane>
       <a-tab-pane key="wih" tab="WIH"></a-tab-pane>
-	      <a-tab-pane key="js_endpoint" tab="JS�ӿ�"></a-tab-pane>
+	      <a-tab-pane key="js_endpoint" tab="JS接口"></a-tab-pane>
 	      <a-tab-pane key="js_sourcemap" tab="Source Map"></a-tab-pane>
-	      <a-tab-pane key="js_config" tab="JS����"></a-tab-pane>
+	      <a-tab-pane key="js_config" tab="JS配置"></a-tab-pane>
     </a-tabs>
 
     <div v-if="tabConfig[activeTab]?.searchFields" class="search-row" style="margin-bottom: 16px;">
       <div v-for="field in tabConfig[activeTab].searchFields" :key="field.key" class="search-item">
-        <span class="label">{{ field.label }}�?/span>
+        <span class="label">{{ field.label }}：</span>
 
         <a-select
             v-if="field.type === 'select'"
@@ -58,7 +58,7 @@
           <template v-else>
             <a-input
                 v-model:value="searchForm[field.key]"
-                :placeholder="`请输�?{field.label}`"
+                :placeholder="`请输入${field.label}`"
                 :bordered="false"
                 style="flex: 1; box-shadow: none;"
                 allowClear
@@ -83,7 +83,7 @@
         <a-input
             v-else
             v-model:value="searchForm[field.key]"
-            :placeholder="`请输�?{field.label}`"
+            :placeholder="`请输入${field.label}`"
             style="width: 200px;"
             allowClear
             @pressEnter="onSearch"
@@ -96,7 +96,7 @@
     </div>
 
     <div style="margin-bottom: 16px;">
-      <a-button style="margin-right: 16px;" @click="resetSearch">�?�?/a-button>
+      <a-button style="margin-right: 16px;" @click="resetSearch">清 除</a-button>
       <a-button v-if="tabConfig[activeTab]?.exportName" type="primary" style="margin-right: 16px;" @click="handleExport">导出{{ tabConfig[activeTab].exportName }}</a-button>
       <a-button v-if="activeTab === 'site'" type="primary" @click="openRiskModal">风险任务下发</a-button>
     </div>
@@ -114,7 +114,7 @@
         <template v-if="column.key === 'index'">
           <a style="">{{ (pagination.current - 1) * pagination.pageSize + index + 1 }}</a>
         </template>
-<!--表格-站点�?->
+<!--表格-站点列-->
         <template v-else-if="column.key === 'site'">
           <div class="site-header">
             <a :href="record.site || record.url" target="_blank" style="font-weight: 500;">
@@ -202,7 +202,7 @@
 
               <div style="cursor: pointer;">
                 <div v-for="(ip, i) in record.ips.slice(0, 5)" :key="i">{{ ip }}</div>
-                <div style="color: var(--arl-text-color); opacity: 0.45; margin-top: 2px;">...�?{{ record.ips.length }} �?/div>
+                <div style="color: var(--arl-text-color); opacity: 0.45; margin-top: 2px;">...等 {{ record.ips.length }} 个</div>
               </div>
             </a-tooltip>
 
@@ -228,7 +228,7 @@
               </template>
               <div style="cursor: pointer;">
                 <div v-for="(dom, i) in record.domain.slice(0, 5)" :key="i">{{ dom }}</div>
-                <div style="color: var(--arl-text-color); opacity: 0.45; margin-top: 2px;">...�?{{ record.domain.length }} �?/div>
+                <div style="color: var(--arl-text-color); opacity: 0.45; margin-top: 2px;">...等 {{ record.domain.length }} 个</div>
               </div>
             </a-tooltip>
             <div v-else>
@@ -261,23 +261,23 @@
             </div>
 
             <div style="display: flex; margin-bottom: 6px;">
-              <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">签发者名�?/div>
+              <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">签发者名称</div>
               <div style="flex: 1; word-break: break-all; color: var(--arl-text-color);">{{ record.cert.issuer_dn || '-' }}</div>
             </div>
 
             <div style="display: flex; margin-bottom: 6px;">
-              <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">使用者备用名�?/div>
+              <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">使用者备用名称</div>
               <div style="flex: 1; word-break: break-all; color: var(--arl-text-color);">{{ record.cert.extensions?.subjectAltName || '-' }}</div>
             </div>
 
             <div style="display: flex; margin-bottom: 6px;">
-              <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">序列�?/div>
+              <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">序列号</div>
               <div style="flex: 1; word-break: break-all; color: var(--arl-text-color);">{{ record.cert.serial_number || '-' }}</div>
             </div>
 
             <div style="display: flex; margin-bottom: 16px;">
               <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">时间</div>
-              <div style="flex: 1; color: var(--arl-text-color);">{{ record.cert.validity?.start || '-' }} �?{{ record.cert.validity?.end || '-' }}</div>
+              <div style="flex: 1; color: var(--arl-text-color);">{{ record.cert.validity?.start || '-' }} 至 {{ record.cert.validity?.end || '-' }}</div>
             </div>
 
             <div style="font-weight: 600; font-size: 14px; margin-bottom: 12px;">指纹</div>
@@ -358,7 +358,7 @@
     </a-table>
 
     <div v-if="tabConfig[activeTab]" style="display: flex; justify-content: space-between; align-items: center; padding: 0 16px; margin-top: 16px;">
-      <div style="color: var(--arl-text-color); opacity: 0.65;">�?{{ Math.ceil(pagination.total / pagination.pageSize) || 1 }} �?/ {{ pagination.total }} 条数�?/div>
+      <div style="color: var(--arl-text-color); opacity: 0.65;">共 {{ Math.ceil(pagination.total / pagination.pageSize) || 1 }} 页 / {{ pagination.total }} 条数据</div>
       <a-pagination v-model:current="pagination.current" v-model:pageSize="pagination.pageSize" :total="pagination.total" show-size-changer @change="handleTableChange" @showSizeChange="handleTableChange" />
     </div>
 
@@ -366,29 +366,29 @@
       <img :src="previewImage" style="width: 100%; max-height: 85vh; object-fit: contain; display: block;" />
     </a-modal>
 
-    <a-modal v-model:open="riskVisible" title="添加风险巡航任务" @ok="submitRiskTask" :confirmLoading="riskSubmitLoading" width="520px" wrapClassName="arl-theme-modal" rootClassName="arl-theme-modal" okText="�?�? cancelText="�?�?>
+    <a-modal v-model:open="riskVisible" title="添加风险巡航任务" @ok="submitRiskTask" :confirmLoading="riskSubmitLoading" width="520px" wrapClassName="arl-theme-modal" rootClassName="arl-theme-modal" okText="确 定" cancelText="取 消">
       <a-form :model="riskForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 17 }" style="margin-top: 20px;">
         <a-form-item label="策略名称" name="policy_id" :rules="[{ required: true, message: '请选择策略' }]">
           <a-select v-model:value="riskForm.policy_id" placeholder="请选择策略" :options="policyOptions" show-search option-filter-prop="label" @change="handlePolicyChange"/>
         </a-form-item>
-        <a-form-item label="任务名称" name="name" :rules="[{ required: true, message: '请输入任务名�? }]">
+        <a-form-item label="任务名称" name="name" :rules="[{ required: true, message: '请输入任务名称' }]">
           <a-input v-model:value="riskForm.name" />
         </a-form-item>
-        <div style="margin-left: 104px; color: var(--arl-text-color); margin-top: 16px;">目标：选择目标�?{{ targetCount }}</div>
+        <div style="margin-left: 104px; color: var(--arl-text-color); margin-top: 16px;">目标：选择目标数 {{ targetCount }}</div>
       </a-form>
     </a-modal>
 
   </div>
 
     <!-- 添加标签弹窗 -->
-    <a-modal v-model:open="tagVisible" title="添加标签" @ok="submitTag" :confirmLoading="tagSubmitLoading" width="400px" okText="�?�? cancelText="�?�?>
+    <a-modal v-model:open="tagVisible" title="添加标签" @ok="submitTag" :confirmLoading="tagSubmitLoading" width="400px" okText="确 定" cancelText="取 消">
       <div style="margin-top: 20px;">
-        <a-input v-model:value="newTagValue" placeholder="请输入标签名�? />
+        <a-input v-model:value="newTagValue" placeholder="请输入标签名称" />
       </div>
     </a-modal>
 
     <!-- 指纹统计关联站点弹窗 -->
-    <a-modal v-model:open="fingerModalVisible" :title="`指纹关联站点�?{currentFingerName}`" :footer="null" width="800px">
+    <a-modal v-model:open="fingerModalVisible" :title="`指纹关联站点：${currentFingerName}`" :footer="null" width="800px">
       <a-table
         :dataSource="fingerModalData"
         :columns="fingerModalColumns"
@@ -472,7 +472,7 @@ const previewVisible = ref(false);
 const previewImage = ref('');
 const handlePreview = (url) => { previewImage.value = url; previewVisible.value = true; };
 
-// 💡 简化版 Config：仅保留全局搜索需要的配置，去�?deleteUrl
+// 💡 简化版 Config：仅保留全局搜索需要的配置，去除 deleteUrl
 const tabConfig = reactive({
   site: {
     url: '/site/',
@@ -492,25 +492,25 @@ const tabConfig = reactive({
       { label: 'favicon hash', key: 'favicon.hash', operator: '=' },
       { label: '标签', key: 'tag', operator: '=' }
     ],
-    // 💥 修复：删除了瞎加�?IP、端口和操作列，完全对齐原版站点表格！表格控�?
+    // 💥 修复：删除了瞎加的 IP、端口和操作列，完全对齐原版站点表格！表格控制
     cols: [
       { title: '序号', key: 'index', width: 60, align: 'center' },
       { title: '站点', key: 'site', width: 250 },
       { title: '标题', dataIndex: 'title', key: 'title', width: 200 },
-      // 删除了你加的 server �?status �?
+      // 删除了你加的 server 和 status 列
       { title: 'headers', key: 'headers',width: 500},
       { title: 'finger', key: 'finger', width: 150 },
-      { title: '截图', key: 'screenshot', width: 280 } // 保持宽度给图片留足空�?
+      { title: '截图', key: 'screenshot', width: 280 } // 保持宽度给图片留足空间
     ]
   },
-  // 💡 新增：子域名 Tab �?1:1 配置
+  // 💡 新增：子域名 Tab 的 1:1 配置
   domain: {
     url: '/domain/',
     exportUrl: '/domain/export/',
-    exportName: '子域�?,
+    exportName: '子域名',
     searchFields: [
       { label: '域名', key: 'domain', operator: '=' },
-      { label: '记录�?, key: 'record', operator: '=' },
+      { label: '记录值', key: 'record', operator: '=' },
       { label: '类型', key: 'type', operator: '=' },
       { label: 'IP', key: 'ips', operator: '=' },
       { label: '来源', key: 'source', operator: '=' }
@@ -519,14 +519,14 @@ const tabConfig = reactive({
       { title: '序号', key: 'index', width: 60, align: 'center' },
       { title: '域名', dataIndex: 'domain', key: 'domain', width: 250 },
       { title: '解析类型', dataIndex: 'type', key: 'type', width: 120 },
-      { title: '记录�?, key: 'record', width: 300 },
+      { title: '记录值', key: 'record', width: 300 },
       { title: '关联IP', key: 'ips', width: 250 },
       { title: '来源', dataIndex: 'source', key: 'source', width: 150 }
     ]
   },
 
-  // 💡 新增：IP Tab �?1:1 配置
-// 💡 新增：IP Tab �?1:1 配置
+  // 💡 新增：IP Tab 的 1:1 配置
+// 💡 新增：IP Tab 的 1:1 配置
   ip: {
     url: '/ip/',
     deleteUrl: '/ip/delete/', // 视上一轮测试情况，如果删不掉请改回 '/site/delete/'
@@ -551,26 +551,26 @@ const tabConfig = reactive({
       }
     ],
     cols: [
-      // ... 列配置保持不�?...
+      // ... 列配置保持不变 ...
       { title: '序号', key: 'index', width: 60, align: 'center' },
       { title: 'IP', dataIndex: 'ip', key: 'ip', width: 160 },
       { title: '操作系统', key: 'os_info', width: 150 },
-      { title: '开放端�?, key: 'port_info', width: 200 },
+      { title: '开放端口', key: 'port_info', width: 200 },
       { title: '关联域名', key: 'domain', width: 250 },
       { title: 'CDN', dataIndex: 'cdn_name', key: 'cdn_name', width: 150 },
       { title: 'Geo', key: 'geo_city', width: 180 },
       { title: 'AS', key: 'geo_asn', width: 280 }
     ]
   },
-  // 💡 重新构建�?:1 对齐截图�?SSL证书 配置
+  // 💡 重新构建：1:1 对齐截图的 SSL证书 配置
   cert: {
     url: '/cert/',
     searchFields: [
       { label: 'IP字段', key: 'ip', operator: '=' },
-      { label: '签发者名�?, key: 'cert.issuer_dn', operator: '=' },
+      { label: '签发者名称', key: 'cert.issuer_dn', operator: '=' },
       { label: '主题名称', key: 'cert.subject_dn', operator: '=' },
       { label: 'SHA-1', key: 'cert.fingerprint.sha1', operator: '=' },
-      { label: '使用者备用名�?, key: 'cert.extensions.subjectAltName', operator: '=' }
+      { label: '使用者备用名称', key: 'cert.extensions.subjectAltName', operator: '=' }
     ],
     cols: [
       { title: '序号', key: 'index', width: 60, align: 'center' },
@@ -579,7 +579,7 @@ const tabConfig = reactive({
     ]
   },
 
-  // 💡 新增：服�?Tab �?1:1 配置
+  // 💡 新增：服务 Tab 的 1:1 配置
   service: {
     url: '/service/',
     // 🚨 故意不写 exportUrl，完美对齐原版不带导出功能的 UI
@@ -597,10 +597,10 @@ const tabConfig = reactive({
     ]
   },
 
-  // 💡 新增：文件泄�?Tab �?1:1 配置
+  // 💡 新增：文件泄露 Tab 的 1:1 配置
   fileleak: {
     url: '/fileleak/',
-    // 🚨 同样不配�?exportUrl，隐身导出按�?
+    // 🚨 同样不配置 exportUrl，隐身导出按钮
     searchFields: [
       { label: 'URL', key: 'url', operator: '=' },
       { label: '标题', key: 'title', operator: '=' },
@@ -609,18 +609,18 @@ const tabConfig = reactive({
     ],
     cols: [
       { title: '序号', key: 'index', width: 60, align: 'center' },
-      { title: 'URL', key: 'fileleak_url', width: 500 }, // 用专�?key 渲染超链�?
+      { title: 'URL', key: 'fileleak_url', width: 500 }, // 用专属 key 渲染超链接
       { title: '标题', dataIndex: 'title', key: 'title', width: 250 },
       { title: '状态码', dataIndex: 'status_code', key: 'status_code', width: 100, align: 'center' },
       { title: 'body 长度', dataIndex: 'content_length', key: 'content_length', width: 120, align: 'center' }
     ]
   },
 
-  // 💡 新增：URL信息 Tab �?1:1 配置
+  // 💡 新增：URL信息 Tab 的 1:1 配置
   url: {
     url: '/url/',
     exportUrl: '/url/export/', // 恢复导出接口
-    exportName: 'URL信息',     // 自动生成“导出URL信息”按�?
+    exportName: 'URL信息',     // 自动生成“导出URL信息”按钮
     searchFields: [
       { label: 'URL', key: 'url', operator: '=' },
       { label: '标题', key: 'title', operator: '=' },
@@ -649,7 +649,7 @@ const tabConfig = reactive({
     ],
     cols: [
       { title: '序号', key: 'index', width: 60, align: 'center' },
-      { title: 'URL', key: 'url_link', width: 450 }, // 专用 key 渲染超链�?
+      { title: 'URL', key: 'url_link', width: 450 }, // 专用 key 渲染超链接
       { title: '标题', dataIndex: 'title', key: 'title', width: 200 },
       { title: '状态码', dataIndex: 'status_code', key: 'status_code', width: 100, align: 'center' },
       { title: 'body 长度', dataIndex: 'content_length', key: 'content_length', width: 120, align: 'center' },
@@ -657,31 +657,31 @@ const tabConfig = reactive({
     ]
   },
 
-  // 💡 新增：风�?Tab �?1:1 配置
+  // 💡 新增：风险 Tab 的 1:1 配置
   vuln: {
     url: '/vuln/',
     // 🚨 截图显示无导出按钮，所以不配置 exportUrl
     searchFields: [
       { label: '漏洞名称', key: 'vul_name', operator: '=' },
       { label: '类别', key: 'vul_category', operator: '=' }, // ARL 常用的类别字段名
-      { label: '应用�?, key: 'app_name', operator: '=' },
+      { label: '应用名', key: 'app_name', operator: '=' },
       { label: '目标', key: 'target', operator: '=' }
     ],
     cols: [
       { title: '序号', key: 'index', width: 60, align: 'center' },
       { title: '漏洞名称', dataIndex: 'vul_name', key: 'vul_name', width: 250 },
       { title: '类别', dataIndex: 'vul_category', key: 'vul_category', width: 120 },
-      { title: '应用�?, dataIndex: 'app_name', key: 'app_name', width: 150 },
+      { title: '应用名', dataIndex: 'app_name', key: 'app_name', width: 150 },
       { title: '目标', dataIndex: 'target', key: 'target', width: 200 },
       { title: '凭证', key: 'verify_data', width: 350 }, // 凭证通常较长，用插槽渲染
       { title: '发现时间', dataIndex: 'insert_time', key: 'insert_time', width: 160 }
     ]
   },
 
-  // 💡 新增：服�?python) Tab �?1:1 配置
+  // 💡 新增：服务(python) Tab 的 1:1 配置
   npoc_service: {
     url: '/npoc_service/',
-    // 🚨 截图显示无导出按钮，不配�?exportUrl
+    // 🚨 截图显示无导出按钮，不配置 exportUrl
     searchFields: [
       { label: '协议', key: 'protocol', operator: '=' },
       { label: '主机', key: 'host', operator: '=' },
@@ -698,27 +698,27 @@ const tabConfig = reactive({
     ]
   },
 
-  // 💡 新增：C�?Tab �?1:1 配置
+  // 💡 新增：C段 Tab 的 1:1 配置
   cip: {
     url: '/cip/',
     exportUrl: '/cip/export/', // 恢复导出接口
-    exportName: 'C�?,         // 自动生成“导出C段”按�?
+    exportName: 'C段',         // 自动生成“导出C段”按钮
     searchFields: [
-      { label: 'C�?, key: 'cidr_ip', operator: '=' }
+      { label: 'C段', key: 'cidr_ip', operator: '=' }
     ],
     cols: [
       { title: '序号', key: 'index', width: 60, align: 'center' },
-      { title: 'C�?, dataIndex: 'cidr_ip', key: 'cidr_ip', width: 300 },
-      { title: 'IP�?, key: 'ip_count_col', width: 150, align: 'center' },
-      { title: '域名�?, key: 'domain_count_col', width: 150, align: 'center' }
+      { title: 'C段', dataIndex: 'cidr_ip', key: 'cidr_ip', width: 300 },
+      { title: 'IP数', key: 'ip_count_col', width: 150, align: 'center' },
+      { title: '域名数', key: 'domain_count_col', width: 150, align: 'center' }
     ]
   },
 
-  // 💡 新增：nuclei Tab �?1:1 配置
+  // 💡 新增：nuclei Tab 的 1:1 配置
   nuclei_result: {
     url: '/nuclei_result/',
-    deleteUrl: '/nuclei_result/delete/', // 视后端情况，如果报错可改�?'/site/delete/'
-    // 🚨 截图显示无导出按钮，不配�?exportUrl
+    deleteUrl: '/nuclei_result/delete/', // 视后端情况，如果报错可改为 '/site/delete/'
+    // 🚨 截图显示无导出按钮，不配置 exportUrl
     searchFields: [
       { label: '模版ID', key: 'template_id', operator: '=' },
       { label: '目标', key: 'target', operator: '=' },
@@ -729,19 +729,19 @@ const tabConfig = reactive({
       { title: '序号', key: 'index', width: 60, align: 'center' },
       { title: '模版ID', dataIndex: 'template_id', key: 'template_id', width: 180 },
       { title: '目标', dataIndex: 'target', key: 'target', width: 200 },
-      { title: '漏洞URL', key: 'nuclei_vuln_url', width: 300 }, // 用专�?key 渲染超链�?
+      { title: '漏洞URL', key: 'nuclei_vuln_url', width: 300 }, // 用专用 key 渲染超链接
       { title: '漏洞名称', dataIndex: 'vuln_name', key: 'vul_name', width: 200 },
       { title: '漏洞等级', dataIndex: 'vuln_severity', key: 'vuln_severity', width: 100, align: 'center' },
       { title: '保存时间', dataIndex: 'insert_time', key: 'insert_time', width: 160 },
-      { title: '验证命令', key: 'verify_command', width: 350 } // 命令可能很长，用插槽防撑�?
+      { title: '验证命令', key: 'verify_command', width: 350 } // 命令可能很长，用插槽防撑破
     ]
   },
 
-  // 💡 新增：指纹统�?Tab �?1:1 配置
+  // 💡 新增：指纹统计 Tab 的 1:1 配置
   stat_finger: {
     url: '/stat_finger/',
-    deleteUrl: '/site/delete/', // 视后端情况，如果报错可改�?'/site/delete/'
-    // 🚨 截图显示无导出按�?
+    deleteUrl: '/site/delete/', // 视后端情况，如果报错可改为 '/site/delete/'
+    // 🚨 截图显示无导出按钮
     searchFields: [
       { 
         label: 'finger', 
@@ -749,17 +749,17 @@ const tabConfig = reactive({
         operator: '模糊匹配',
         hasOperatorSelect: true,
         operators: ['模糊匹配', '精确匹配']
-      } // 后端字段�?name
+      } // 后端字段是 name
     ],
     cols: [
       { title: '序号', key: 'index', width: 80, align: 'center' },
-      { title: 'finger', key: 'finger_name', width: 500 }, // 用专�?key 渲染青蓝字体
+      { title: 'finger', key: 'finger_name', width: 500 }, // 用专用 key 渲染青蓝字体
       { title: '数量', dataIndex: 'cnt', key: 'cnt', width: 200 }
     ]
   },
 
 
-  // 💡 新增：WIH (Web Info Hunter) Tab �?1:1 配置
+  // 💡 新增：WIH (Web Info Hunter) Tab 的 1:1 配置
 // 💡 修复：WIH (Web Info Hunter) Tab 配置
   wih: {
     url: '/wih/',
@@ -787,7 +787,7 @@ const tabConfig = reactive({
 
 const columns = ref(tabConfig.site.cols);
 
-// 🚨 核心逻辑调整：去�?task_id 参数，纯净的全局搜索
+// 🚨 核心逻辑调整：去掉 task_id 参数，纯净的全局搜索
 const fetchData = async () => {
   const config = tabConfig[activeTab.value];
   if (!config) return;
@@ -802,8 +802,8 @@ const fetchData = async () => {
         if (fieldConfig && fieldConfig.hasOperatorSelect) {
           if (fieldConfig.operator === '大于') paramKey += '__gt';
           else if (fieldConfig.operator === '小于') paramKey += '__lt';
-          else if (fieldConfig.operator === '不等�?) paramKey += '__neq';
-          else if (fieldConfig.operator === '不包�?) paramKey += '__not';
+          else if (fieldConfig.operator === '不等于') paramKey += '__neq';
+          else if (fieldConfig.operator === '不包含') paramKey += '__not';
           else if (fieldConfig.operator === '精确匹配') paramKey += '__eq';
         }
         params[paramKey] = searchForm.value[key];
@@ -835,8 +835,8 @@ const handleExport = async () => {
         if (fieldConfig && fieldConfig.hasOperatorSelect) {
           if (fieldConfig.operator === '大于') paramKey += '__gt';
           else if (fieldConfig.operator === '小于') paramKey += '__lt';
-          else if (fieldConfig.operator === '不等�?) paramKey += '__neq';
-          else if (fieldConfig.operator === '不包�?) paramKey += '__not';
+          else if (fieldConfig.operator === '不等于') paramKey += '__neq';
+          else if (fieldConfig.operator === '不包含') paramKey += '__not';
           else if (fieldConfig.operator === '精确匹配') paramKey += '__eq';
         }
         params[paramKey] = searchForm.value[key];
@@ -900,7 +900,7 @@ const currentResultSetId = ref('');
 
 const openRiskModal = async () => {
   targetCount.value = pagination.total;
-  if (targetCount.value === 0) return message.warning('当前没有可下发的资产目标�?);
+  if (targetCount.value === 0) return message.warning('当前没有可下发的资产目标！');
 
   riskForm.policy_id = undefined;
   riskForm.name = '';
@@ -909,7 +909,7 @@ const openRiskModal = async () => {
 
   try {
     const policyPromise = request.get('/policy/', { params: { size: 1000 } });
-    const setParams = { ...searchForm.value }; // 全局模式直接传搜索参�?
+    const setParams = { ...searchForm.value }; // 全局模式直接传搜索参数
     const resultSetPromise = request.get('/site/save_result_set/', { params: setParams });
     const [policyRes, resultSetRes] = await Promise.all([policyPromise, resultSetPromise]);
 
@@ -930,7 +930,7 @@ const openRiskModal = async () => {
 const handlePolicyChange = (val, option) => { if (option) riskForm.name = `风险巡航任务-${option.label}`; };
 
 const submitRiskTask = async () => {
-  if (!riskForm.policy_id || !riskForm.name) return message.warning('请填写完整信�?);
+  if (!riskForm.policy_id || !riskForm.name) return message.warning('请填写完整信息');
   riskSubmitLoading.value = true;
   try {
     const res = await request.post('/task/policy/', {
