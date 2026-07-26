@@ -6,6 +6,8 @@ from app.services import fetchCert, run_risk_cruising, run_sniffer
 from app import utils
 from app.services.commonTask import CommonTask, BaseUpdateTask, WebSiteFetch
 from app.config import Config
+from app.services.convergence import ConvergenceController
+from .js_analysis import run_js_analysis
 
 
 logger = utils.get_logger()
@@ -302,7 +304,24 @@ class IPTask(CommonTask):
         self.insert_cip_stat()
         self.insert_task_stat()
 
-        # 如果有关联的资产分组就进行同步，同步这块有点乱
+        # JS 深度分析
+        if self.options.get("js_analysis", False):
+            try:
+                sites = [s.get("site", "") for s in self.site_list if s.get("site")]
+                if sites:
+                    run_js_analysis(sites[:Config.JS_ANALYSIS_MAX_PER_SITE], self.task_id)
+            except Exception as e:
+                logger.exception("JS analysis error: {}".format(e))
+
+        # 循环收敛 - IP 任务暂不支持收敛循环（IP 任务为单轮扫描）
+        if self.options.get("convergence_enabled", False):
+            cc = ConvergenceController(self.task_id, self.options)
+            new_seeds = cc.extract_seeds(self.task_id)
+            new_seeds = cc.filter_new(new_seeds)
+            if new_seeds:
+                logger.info("Convergence seeds found: {} (IP task not auto-recycled)".format(len(new_seeds)))
+
+        # 如果有关联的资产分组就进行同步
         if self.task_tag == "task":
             self.sync_asset()
 

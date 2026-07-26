@@ -15,6 +15,8 @@ from app.services.findVhost import find_vhost
 from app.services.dns_query import run_query_plugin
 from app.services.searchEngines import search_engines
 from app.services import domain_site_update
+from app.services.convergence import ConvergenceController
+from .js_analysis import run_js_analysis
 
 logger = utils.get_logger()
 
@@ -1063,26 +1065,57 @@ class DomainTask(CommonTask):
             domain_site_update(self.task_id, list(self.wih_domain_set), "wih")
 
     def run(self):
+        """执行域名资产发现，支持循环收敛（默认 1 轮=线性扫描）"""
         self.update_task_field("start_time", utils.curr_date())
 
-        self.domain_fetch()
+        options = getattr(self, 'options', {})
+        cc = ConvergenceController(self.task_id, options)
 
-        # 搜索引擎调用
-        self.search_engines()
+        for round_num in range(1, cc.max_rounds + 1):
+            logger.info("=== DomainTask round {}/{} {}, targets in scope ===".format(
+                round_num, cc.max_rounds,
+                "convergence ON" if cc.enabled else "linear mode"))
 
-        self.start_ip_fetch()
+            self.domain_fetch()
+            self.search_engines()
+            self.start_ip_fetch()
+            self.start_site_fetch()
+            self.start_find_vhost()
+            self.start_poc_run()
+            self.start_wih_domain_update()
 
-        self.start_site_fetch()
+            # JS 深度分析（新增步骤）
+            if options.get("js_analysis", False) or options.get("web_info_hunter", True):
+                try:
+                    sites = [s["site"] for s in utils.conn_db("site").find(
+                        {"task_id": self.task_id}, {"site": 1})]
+                    if sites:
+                        logger.info("JS analysis for {} sites".format(len(sites)))
+                        run_js_analysis(sites[:Config.JS_ANALYSIS_MAX_PER_SITE], self.task_id)
+                except Exception as e:
+                    logger.exception("JS analysis error: {}".format(e))
 
-        self.start_find_vhost()
+            # 收敛判定（整轮完成后）
+            if round_num < cc.max_rounds and cc.enabled:
+                new_seeds = cc.extract_seeds(self.task_id)
+                new_seeds = cc.filter_new(new_seeds)
+                converged, reason = cc.should_converge(round_num, new_seeds)
+                cc.log_round(round_num, new_seeds, converged, reason)
+                self.update_task_field("round_info", cc.rounds_log)
+                logger.info("Round {} converge: {}. {}".format(
+                    round_num, "YES" if converged else "NO", reason))
+                if converged:
+                    break
+                # 未收敛：将新种子加入下一轮目标
+                new_targets = ",\n".join(sorted(new_seeds)[:100])
+                if new_targets:
+                    logger.info("New seeds for round {}: {}".format(round_num + 1, new_targets))
+                    self.base_domain = new_targets
+            else:
+                break  # 不启用收敛或最后一轮，直接结束
 
-        self.start_poc_run()
-
-        self.start_wih_domain_update()
-
-        # 执行统计和同步操作
+        # 统计和同步
         self.common_run()
-
         self.update_task_field("status", TaskStatus.DONE)
         self.update_task_field("end_time", utils.curr_date())
 

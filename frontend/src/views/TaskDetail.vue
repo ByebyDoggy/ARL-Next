@@ -20,15 +20,15 @@
 
     <a-tabs v-model:activeKey="activeTab" type="card" class="arl-detail-tabs">
       <a-tab-pane key="site" :tab="query.task_id ? `站点 - ${queryCounts.site}` : '站点'"></a-tab-pane>
-      <a-tab-pane key="domain" :tab="query.task_id ? `子域名 - ${queryCounts.domain}` : '子域名'"></a-tab-pane>
+      <a-tab-pane key="domain" :tab="query.task_id ? `子域�?- ${queryCounts.domain}` : '子域�?"></a-tab-pane>
       <a-tab-pane key="ip" :tab="query.task_id ? `IP - ${queryCounts.ip}` : 'IP'"></a-tab-pane>
       <a-tab-pane key="cert" :tab="query.task_id ? `SSL证书 - ${queryCounts.cert}` : 'SSL证书'"></a-tab-pane>
       <a-tab-pane key="service" :tab="query.task_id ? `服务 - ${queryCounts.service}` : '服务'"></a-tab-pane>
       <a-tab-pane key="fileleak" :tab="query.task_id ? `文件泄露 - ${queryCounts.fileleak}` : '文件泄露'"></a-tab-pane>
       <a-tab-pane key="url" :tab="query.task_id ? `URL信息 - ${queryCounts.url}` : 'URL信息'"></a-tab-pane>
       <a-tab-pane key="vuln" :tab="query.task_id ? `风险 - ${queryCounts.vuln}` : '风险'"></a-tab-pane>
-      <a-tab-pane key="npoc_service" :tab="query.task_id ? `服务（python） - ${queryCounts.npoc_service}` : '服务（python）'"></a-tab-pane>
-      <a-tab-pane key="cip" :tab="query.task_id ? `C段 - ${queryCounts.cip}` : 'C段'"></a-tab-pane>
+      <a-tab-pane key="npoc_service" :tab="query.task_id ? `服务（python�?- ${queryCounts.npoc_service}` : '服务（python�?"></a-tab-pane>
+      <a-tab-pane key="cip" :tab="query.task_id ? `C�?- ${queryCounts.cip}` : 'C�?"></a-tab-pane>
       <a-tab-pane key="nuclei_result" :tab="query.task_id ? `nuclei - ${queryCounts.nuclei_result}` : 'nuclei'"></a-tab-pane>
       <a-tab-pane key="stat_finger" :tab="query.task_id ? `指纹统计 - ${queryCounts.stat_finger}` : '指纹统计'"></a-tab-pane>
       <a-tab-pane key="wih" :tab="query.task_id ? `WIH - ${queryCounts.wih}` : 'WIH'"></a-tab-pane>
@@ -37,7 +37,7 @@
 
     <div v-if="tabConfig[activeTab]?.searchFields && activeTab !== 'syslog'" class="search-row" style="margin-bottom: 16px;">
       <div v-for="field in tabConfig[activeTab].searchFields" :key="field.key" class="search-item">
-        <span class="label">{{ field.label }}：</span>
+        <span class="label">{{ field.label }}�?/span>
 
         <a-select
             v-if="field.type === 'select'"
@@ -73,7 +73,7 @@
           <template v-else>
             <a-input
                 v-model:value="searchForm[field.key]"
-                :placeholder="`请输入${field.label}`"
+                :placeholder="`请输�?{field.label}`"
                 :bordered="false"
                 style="flex: 1; box-shadow: none;"
                 allowClear
@@ -98,7 +98,7 @@
         <a-input
             v-else
             v-model:value="searchForm[field.key]"
-            :placeholder="`请输入${field.label}`"
+            :placeholder="`请输�?{field.label}`"
             style="width: 200px;"
             allowClear
             @pressEnter="onSearch"
@@ -112,7 +112,7 @@
 
     <div v-show="activeTab !== 'syslog'" style="margin-bottom: 16px;">
       <a-button :disabled="!hasSelected" style="margin-right: 16px;" @click="handleBatchDelete">批量删除</a-button>
-      <a-button style="margin-right: 16px;" @click="resetSearch">清 除</a-button>
+      <a-button style="margin-right: 16px;" @click="resetSearch">�?�?/a-button>
       <a-button v-if="tabConfig[activeTab]?.exportName" type="primary" style="margin-right: 16px;" @click="handleExport">导出{{ tabConfig[activeTab].exportName }}</a-button>
       <a-button v-if="activeTab === 'site'" type="primary" @click="openRiskModal">风险任务下发</a-button>
     </div>
@@ -131,7 +131,7 @@
       <template #bodyCell="{ column, record, index }">
 
         <template v-if="column.key === 'index'">{{ (pagination.current - 1) * pagination.pageSize + index + 1 }}</template>
-<!--表格-站点列-->
+<!--表格-站点�?->
         <template v-else-if="column.key === 'site'">
           <div class="site-header">
             <a :href="record.site || record.url" target="_blank" style="font-weight: 500;">
@@ -219,7 +219,7 @@
 
               <div style="cursor: pointer;">
                 <div v-for="(ip, i) in record.ips.slice(0, 5)" :key="i">{{ ip }}</div>
-                <div style="color: var(--arl-text-color); opacity: 0.45; margin-top: 2px;">...等 {{ record.ips.length }} 个</div>
+                <div style="color: var(--arl-text-color); opacity: 0.45; margin-top: 2px;">...�?{{ record.ips.length }} �?/div>
               </div>
             </a-tooltip>
 
@@ -245,7 +245,7 @@
               </template>
               <div style="cursor: pointer;">
                 <div v-for="(dom, i) in record.domain.slice(0, 5)" :key="i">{{ dom }}</div>
-                <div style="color: var(--arl-text-color); opacity: 0.45; margin-top: 2px;">...等 {{ record.domain.length }} 个</div>
+                <div style="color: var(--arl-text-color); opacity: 0.45; margin-top: 2px;">...�?{{ record.domain.length }} �?/div>
               </div>
             </a-tooltip>
             <div v-else>
@@ -278,23 +278,23 @@
             </div>
 
             <div style="display: flex; margin-bottom: 6px;">
-              <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">签发者名称</div>
+              <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">签发者名�?/div>
               <div style="flex: 1; word-break: break-all; color: var(--arl-text-color);">{{ record.cert.issuer_dn || '-' }}</div>
             </div>
 
             <div style="display: flex; margin-bottom: 6px;">
-              <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">使用者备用名称</div>
+              <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">使用者备用名�?/div>
               <div style="flex: 1; word-break: break-all; color: var(--arl-text-color);">{{ record.cert.extensions?.subjectAltName || '-' }}</div>
             </div>
 
             <div style="display: flex; margin-bottom: 6px;">
-              <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">序列号</div>
+              <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">序列�?/div>
               <div style="flex: 1; word-break: break-all; color: var(--arl-text-color);">{{ record.cert.serial_number || '-' }}</div>
             </div>
 
             <div style="display: flex; margin-bottom: 16px;">
               <div style="width: 120px; text-align: right; margin-right: 12px; font-weight: 500;">时间</div>
-              <div style="flex: 1; color: var(--arl-text-color);">{{ record.cert.validity?.start || '-' }} 至 {{ record.cert.validity?.end || '-' }}</div>
+              <div style="flex: 1; color: var(--arl-text-color);">{{ record.cert.validity?.start || '-' }} �?{{ record.cert.validity?.end || '-' }}</div>
             </div>
 
             <div style="font-weight: 600; font-size: 14px; margin-bottom: 12px;">指纹</div>
@@ -375,7 +375,7 @@
     </a-table>
 
     <!-- 指纹统计关联站点弹窗 -->
-    <a-modal v-model:open="fingerModalVisible" :title="`指纹关联站点：${currentFingerName}`" :footer="null" width="800px">
+    <a-modal v-model:open="fingerModalVisible" :title="`指纹关联站点�?{currentFingerName}`" :footer="null" width="800px">
       <a-table
         :dataSource="fingerModalData"
         :columns="fingerModalColumns"
@@ -407,7 +407,7 @@
     </a-modal>
 
     <div v-if="tabConfig[activeTab] && activeTab !== 'syslog'" style="display: flex; justify-content: space-between; align-items: center; padding: 0 16px;">
-      <div style="color: var(--arl-text-color); opacity: 0.65;">共 {{ Math.ceil(pagination.total / pagination.pageSize) || 1 }} 页 / {{ pagination.total }} 条数据</div>
+      <div style="color: var(--arl-text-color); opacity: 0.65;">�?{{ Math.ceil(pagination.total / pagination.pageSize) || 1 }} �?/ {{ pagination.total }} 条数�?/div>
       <a-pagination v-model:current="pagination.current" v-model:pageSize="pagination.pageSize" :total="pagination.total" show-size-changer @change="handleTableChange" @showSizeChange="handleTableChange" />
     </div>
 
@@ -438,8 +438,8 @@
         width="520px"
         wrapClassName="arl-theme-modal"
         rootClassName="arl-theme-modal"
-        okText="确 定"
-        cancelText="取 消"
+        okText="�?�?
+        cancelText="�?�?
     >
       <a-form :model="riskForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 17 }" style="margin-top: 20px;">
         <a-form-item label="策略名称" name="policy_id" :rules="[{ required: true, message: '请选择策略' }]">
@@ -453,12 +453,12 @@
           />
         </a-form-item>
 
-        <a-form-item label="任务名称" name="name" :rules="[{ required: true, message: '请输入任务名称' }]">
+        <a-form-item label="任务名称" name="name" :rules="[{ required: true, message: '请输入任务名�? }]">
           <a-input v-model:value="riskForm.name" />
         </a-form-item>
 
         <div style="margin-left: 104px; color: var(--arl-text-color); margin-top: 16px;">
-          目标：选择目标数 {{ targetCount }}
+          目标：选择目标�?{{ targetCount }}
         </div>
       </a-form>
     </a-modal>
@@ -467,7 +467,7 @@
 </template>
 
 <script setup>
-// 💥 核心修改 2：引入 createVNode 和 Modal、ExclamationCircleOutlined
+// 💥 核心修改 2：引�?createVNode �?Modal、ExclamationCircleOutlined
 import { ref, onMounted, reactive, watch, computed, createVNode, onUnmounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import request from '../utils/request';
@@ -530,7 +530,7 @@ const targetList = computed(() => {
 const displayTitle = computed(() => {
   const list = targetList.value;
   if (list.length <= 1) return `${targetName.value} 相关资产`;
-  return `${list[0]} 等 ${list.length} 个目标相关资产`;
+  return `${list[0]} �?${list.length} 个目标相关资产`;
 });
 const activeTab = ref('site');
 const loading = ref(false);
@@ -539,7 +539,7 @@ const dataSource = ref([]);
 const terminalContainer = ref(null);
 const pauseScroll = ref(false);
 
-// 弹窗状态
+// 弹窗状�?
 const previewVisible = ref(false);
 const previewImage = ref('');
 
@@ -563,6 +563,7 @@ const queryCounts = reactive({
   nuclei_result: Number(query.nuclei_result_cnt) || 0,
   stat_finger: Number(query.stat_finger_cnt) || 0,
   wih: Number(query.wih_cnt) || 0,
+  js_report: Number(query.js_report_cnt) || 0,
 });
 
 const selectedRowKeys = ref([]);
@@ -572,14 +573,14 @@ const onSelectChange = (keys) => { selectedRowKeys.value = keys; };
 const searchForm = ref({});
 const pagination = reactive({ current: 1, pageSize: 10, total: 0 });
 
-// 💥 核心修改 3：在配置字典中加入 deleteUrl
+// 💥 核心修改 3：在配置字典中加�?deleteUrl
 const tabConfig = reactive({
   site: {
     url: '/site/',
     deleteUrl: '/site/delete/',
     searchFields: [
       { label: '站点', key: 'site', operator: '=' },
-      { label: '主机名', key: 'hostname', operator: '=' },
+      { label: '主机�?, key: 'hostname', operator: '=' },
       { label: '标题', key: 'title', operator: '=' },
       { label: 'Web Server', key: 'server', operator: '=' },
       { label: '状态码', key: 'status_code', operator: '=' },
@@ -588,26 +589,26 @@ const tabConfig = reactive({
       { label: 'favicon hash', key: 'favicon_hash', operator: '=' },
       { label: '标签', key: 'tag', operator: '=' }
     ],
-    // 💥 修复：删除了瞎加的 IP、端口和操作列，完全对齐原版站点表格！表格控制
+    // 💥 修复：删除了瞎加�?IP、端口和操作列，完全对齐原版站点表格！表格控�?
     cols: [
       { title: '序号', key: 'index', width: 60, align: 'center' },
       { title: '站点', key: 'site', width: 250 },
       { title: '标题', dataIndex: 'title', key: 'title', width: 200 },
-      // 删除了你加的 server 和 status 列
+      // 删除了你加的 server �?status �?
       { title: 'headers', key: 'headers',width: 500},
       { title: 'finger', key: 'finger', width: 150 },
-      { title: '截图', key: 'screenshot', width: 280 } // 保持宽度给图片留足空间
+      { title: '截图', key: 'screenshot', width: 280 } // 保持宽度给图片留足空�?
     ]
   },
-  // 💡 新增：子域名 Tab 的 1:1 配置
+  // 💡 新增：子域名 Tab �?1:1 配置
   domain: {
     url: '/domain/',
     deleteUrl: '/domain/delete/',
     exportUrl: '/domain/export/',
-    exportName: '子域名',
+    exportName: '子域�?,
     searchFields: [
       { label: '域名', key: 'domain', operator: '=' },
-      { label: '记录值', key: 'record', operator: '=' },
+      { label: '记录�?, key: 'record', operator: '=' },
       { label: '类型', key: 'type', operator: '=' },
       { label: 'IP', key: 'ips', operator: '=' },
       { label: '来源', key: 'source', operator: '=' }
@@ -616,14 +617,14 @@ const tabConfig = reactive({
       { title: '序号', key: 'index', width: 60, align: 'center' },
       { title: '域名', dataIndex: 'domain', key: 'domain', width: 250 },
       { title: '解析类型', dataIndex: 'type', key: 'type', width: 120 },
-      { title: '记录值', key: 'record', width: 300 },
+      { title: '记录�?, key: 'record', width: 300 },
       { title: '关联IP', key: 'ips', width: 250 },
       { title: '来源', dataIndex: 'source', key: 'source', width: 150 }
     ]
   },
 
-  // 💡 新增：IP Tab 的 1:1 配置
-// 💡 新增：IP Tab 的 1:1 配置
+  // 💡 新增：IP Tab �?1:1 配置
+// 💡 新增：IP Tab �?1:1 配置
   ip: {
     url: '/ip/',
     deleteUrl: '/ip/delete/', // 视上一轮测试情况，如果删不掉请改回 '/site/delete/'
@@ -648,27 +649,27 @@ const tabConfig = reactive({
       }
     ],
     cols: [
-      // ... 列配置保持不变 ...
+      // ... 列配置保持不�?...
       { title: '序号', key: 'index', width: 60, align: 'center' },
       { title: 'IP', dataIndex: 'ip', key: 'ip', width: 160 },
       { title: '操作系统', key: 'os_info', width: 150 },
-      { title: '开放端口', key: 'port_info', width: 200 },
+      { title: '开放端�?, key: 'port_info', width: 200 },
       { title: '关联域名', key: 'domain', width: 250 },
       { title: 'CDN', dataIndex: 'cdn_name', key: 'cdn_name', width: 150 },
       { title: 'Geo', key: 'geo_city', width: 180 },
       { title: 'AS', key: 'geo_asn', width: 280 }
     ]
   },
-  // 💡 重新构建：1:1 对齐截图的 SSL证书 配置
+  // 💡 重新构建�?:1 对齐截图�?SSL证书 配置
   cert: {
     url: '/cert/',
     deleteUrl: '/cert/delete/',
     searchFields: [
       { label: 'IP字段', key: 'ip', operator: '=' },
-      { label: '签发者名称', key: 'cert.issuer_dn', operator: '=' },
+      { label: '签发者名�?, key: 'cert.issuer_dn', operator: '=' },
       { label: '主题名称', key: 'cert.subject_dn', operator: '=' },
       { label: 'SHA-1', key: 'cert.fingerprint.sha1', operator: '=' },
-      { label: '使用者备用名称', key: 'cert.extensions.subjectAltName', operator: '=' }
+      { label: '使用者备用名�?, key: 'cert.extensions.subjectAltName', operator: '=' }
     ],
     cols: [
       { title: '序号', key: 'index', width: 60, align: 'center' },
@@ -677,7 +678,7 @@ const tabConfig = reactive({
     ]
   },
 
-  // 💡 新增：服务 Tab 的 1:1 配置
+  // 💡 新增：服�?Tab �?1:1 配置
   service: {
     url: '/service/',
     deleteUrl: '/service/delete/',
@@ -696,11 +697,11 @@ const tabConfig = reactive({
     ]
   },
 
-  // 💡 新增：文件泄露 Tab 的 1:1 配置
+  // 💡 新增：文件泄�?Tab �?1:1 配置
   fileleak: {
     url: '/fileleak/',
     deleteUrl: '/fileleak/delete/',
-    // 🚨 同样不配置 exportUrl，隐身导出按钮
+    // 🚨 同样不配�?exportUrl，隐身导出按�?
     searchFields: [
       { label: 'URL', key: 'url', operator: '=' },
       { label: '标题', key: 'title', operator: '=' },
@@ -709,19 +710,19 @@ const tabConfig = reactive({
     ],
     cols: [
       { title: '序号', key: 'index', width: 60, align: 'center' },
-      { title: 'URL', key: 'fileleak_url', width: 500 }, // 用专属 key 渲染超链接
+      { title: 'URL', key: 'fileleak_url', width: 500 }, // 用专�?key 渲染超链�?
       { title: '标题', dataIndex: 'title', key: 'title', width: 250 },
       { title: '状态码', dataIndex: 'status_code', key: 'status_code', width: 100, align: 'center' },
       { title: 'body 长度', dataIndex: 'content_length', key: 'content_length', width: 120, align: 'center' }
     ]
   },
 
-  // 💡 新增：URL信息 Tab 的 1:1 配置
+  // 💡 新增：URL信息 Tab �?1:1 配置
   url: {
     url: '/url/',
     deleteUrl: '/site/delete/',
     exportUrl: '/url/export/', // 恢复导出接口
-    exportName: 'URL信息',     // 自动生成“导出URL信息”按钮
+    exportName: 'URL信息',     // 自动生成“导出URL信息”按�?
     searchFields: [
       { label: 'URL', key: 'url', operator: '=' },
       { label: '标题', key: 'title', operator: '=' },
@@ -750,7 +751,7 @@ const tabConfig = reactive({
     ],
     cols: [
       { title: '序号', key: 'index', width: 60, align: 'center' },
-      { title: 'URL', key: 'url_link', width: 450 }, // 专用 key 渲染超链接
+      { title: 'URL', key: 'url_link', width: 450 }, // 专用 key 渲染超链�?
       { title: '标题', dataIndex: 'title', key: 'title', width: 200 },
       { title: '状态码', dataIndex: 'status_code', key: 'status_code', width: 100, align: 'center' },
       { title: 'body 长度', dataIndex: 'content_length', key: 'content_length', width: 120, align: 'center' },
@@ -758,7 +759,7 @@ const tabConfig = reactive({
     ]
   },
 
-  // 💡 新增：风险 Tab 的 1:1 配置
+  // 💡 新增：风�?Tab �?1:1 配置
   vuln: {
     url: '/vuln/',
     deleteUrl: '/vuln/delete/',
@@ -766,25 +767,25 @@ const tabConfig = reactive({
     searchFields: [
       { label: '漏洞名称', key: 'vul_name', operator: '=' },
       { label: '类别', key: 'vul_category', operator: '=' }, // ARL 常用的类别字段名
-      { label: '应用名', key: 'app_name', operator: '=' },
+      { label: '应用�?, key: 'app_name', operator: '=' },
       { label: '目标', key: 'target', operator: '=' }
     ],
     cols: [
       { title: '序号', key: 'index', width: 60, align: 'center' },
       { title: '漏洞名称', dataIndex: 'vul_name', key: 'vul_name', width: 250 },
       { title: '类别', dataIndex: 'vul_category', key: 'vul_category', width: 120 },
-      { title: '应用名', dataIndex: 'app_name', key: 'app_name', width: 150 },
+      { title: '应用�?, dataIndex: 'app_name', key: 'app_name', width: 150 },
       { title: '目标', dataIndex: 'target', key: 'target', width: 200 },
       { title: '凭证', key: 'verify_data', width: 350 }, // 凭证通常较长，用插槽渲染
       { title: '发现时间', dataIndex: 'insert_time', key: 'insert_time', width: 160 }
     ]
   },
 
-  // 💡 新增：服务(python) Tab 的 1:1 配置
+  // 💡 新增：服�?python) Tab �?1:1 配置
   npoc_service: {
     url: '/npoc_service/',
     deleteUrl: '/npoc_service/delete/',
-    // 🚨 截图显示无导出按钮，不配置 exportUrl
+    // 🚨 截图显示无导出按钮，不配�?exportUrl
     searchFields: [
       { label: '协议', key: 'protocol', operator: '=' },
       { label: '主机', key: 'host', operator: '=' },
@@ -801,28 +802,28 @@ const tabConfig = reactive({
     ]
   },
 
-  // 💡 新增：C段 Tab 的 1:1 配置
+  // 💡 新增：C�?Tab �?1:1 配置
   cip: {
     url: '/cip/',
     deleteUrl: '/site/delete/',
     exportUrl: '/cip/export/', // 恢复导出接口
-    exportName: 'C段',         // 自动生成“导出C段”按钮
+    exportName: 'C�?,         // 自动生成“导出C段”按�?
     searchFields: [
-      { label: 'C段', key: 'cidr_ip', operator: '=' }
+      { label: 'C�?, key: 'cidr_ip', operator: '=' }
     ],
     cols: [
       { title: '序号', key: 'index', width: 60, align: 'center' },
-      { title: 'C段', dataIndex: 'cidr_ip', key: 'cidr_ip', width: 300 },
-      { title: 'IP数', key: 'ip_count_col', width: 150, align: 'center' },
-      { title: '域名数', key: 'domain_count_col', width: 150, align: 'center' }
+      { title: 'C�?, dataIndex: 'cidr_ip', key: 'cidr_ip', width: 300 },
+      { title: 'IP�?, key: 'ip_count_col', width: 150, align: 'center' },
+      { title: '域名�?, key: 'domain_count_col', width: 150, align: 'center' }
     ]
   },
 
-  // 💡 新增：nuclei Tab 的 1:1 配置
+  // 💡 新增：nuclei Tab �?1:1 配置
   nuclei_result: {
     url: '/nuclei_result/',
-    deleteUrl: '/nuclei_result/delete/', // 视后端情况，如果报错可改为 '/site/delete/'
-    // 🚨 截图显示无导出按钮，不配置 exportUrl
+    deleteUrl: '/nuclei_result/delete/', // 视后端情况，如果报错可改�?'/site/delete/'
+    // 🚨 截图显示无导出按钮，不配�?exportUrl
     searchFields: [
       { label: '模版ID', key: 'template_id', operator: '=' },
       { label: '目标', key: 'target', operator: '=' },
@@ -833,19 +834,19 @@ const tabConfig = reactive({
       { title: '序号', key: 'index', width: 60, align: 'center' },
       { title: '模版ID', dataIndex: 'template_id', key: 'template_id', width: 180 },
       { title: '目标', dataIndex: 'target', key: 'target', width: 200 },
-      { title: '漏洞URL', key: 'nuclei_vuln_url', width: 300 }, // 用专用 key 渲染超链接
+      { title: '漏洞URL', key: 'nuclei_vuln_url', width: 300 }, // 用专�?key 渲染超链�?
       { title: '漏洞名称', dataIndex: 'vuln_name', key: 'vul_name', width: 200 },
       { title: '漏洞等级', dataIndex: 'vuln_severity', key: 'vuln_severity', width: 100, align: 'center' },
       { title: '保存时间', dataIndex: 'insert_time', key: 'insert_time', width: 160 },
-      { title: '验证命令', key: 'verify_command', width: 350 } // 命令可能很长，用插槽防撑破
+      { title: '验证命令', key: 'verify_command', width: 350 } // 命令可能很长，用插槽防撑�?
     ]
   },
 
-  // 💡 新增：指纹统计 Tab 的 1:1 配置
+  // 💡 新增：指纹统�?Tab �?1:1 配置
   stat_finger: {
     url: '/stat_finger/',
-    deleteUrl: '/site/delete/', // 视后端情况，如果报错可改为 '/site/delete/'
-    // 🚨 截图显示无导出按钮
+    deleteUrl: '/site/delete/', // 视后端情况，如果报错可改�?'/site/delete/'
+    // 🚨 截图显示无导出按�?
     searchFields: [
       { 
         label: 'finger', 
@@ -857,13 +858,13 @@ const tabConfig = reactive({
     ],
     cols: [
       { title: '序号', key: 'index', width: 80, align: 'center' },
-      { title: 'finger', key: 'finger_name', width: 500 }, // 用专用 key 渲染青蓝字体
+      { title: 'finger', key: 'finger_name', width: 500 }, // 用专�?key 渲染青蓝字体
       { title: '数量', dataIndex: 'cnt', key: 'cnt', width: 200 }
     ]
   },
 
 
-  // 💡 新增：WIH (Web Info Hunter) Tab 的 1:1 配置
+  // 💡 新增：WIH (Web Info Hunter) Tab �?1:1 配置
 // 💡 修复：WIH (Web Info Hunter) Tab 配置
   wih: {
     url: '/wih/',
@@ -889,10 +890,10 @@ const tabConfig = reactive({
     ]
   },
 
-  // 💡 新增：任务日志 Tab 的配置
+  // 💡 新增：任务日�?Tab 的配�?
   syslog: {
     url: '/syslog/',
-    // 隐藏删除和导出按钮
+    // 隐藏删除和导出按�?
     searchFields: [
       { label: '日志级别', key: 'level', operator: '=' },
       { label: '日志标题', key: 'title', operator: '=' },
@@ -913,7 +914,7 @@ const columns = ref(tabConfig.site.cols);
 // 加载数据 (兼容单任务与全局查看)
 const fetchData = async (isPolling = false) => {
   const taskId = query.task_id;
-  // 🚨 核心修改 1：删除了 if (!taskId) return; 让全局查看也能放行！
+  // 🚨 核心修改 1：删除了 if (!taskId) return; 让全局查看也能放行�?
 
   const config = tabConfig[activeTab.value];
   if (!config) {
@@ -925,7 +926,7 @@ const fetchData = async (isPolling = false) => {
     loading.value = true;
   }
   try {
-    // 🚨 核心修改 2：动态拼装参数，有 taskId 才传
+    // 🚨 核心修改 2：动态拼装参数，�?taskId 才传
     const params = { page: pagination.current, size: pagination.pageSize };
     if (taskId) {
       params.task_id = taskId;
@@ -938,8 +939,8 @@ const fetchData = async (isPolling = false) => {
         if (fieldConfig && fieldConfig.hasOperatorSelect) {
           if (fieldConfig.operator === '大于') paramKey += '__gt';
           else if (fieldConfig.operator === '小于') paramKey += '__lt';
-          else if (fieldConfig.operator === '不等于') paramKey += '__neq';
-          else if (fieldConfig.operator === '不包含') paramKey += '__not';
+          else if (fieldConfig.operator === '不等�?) paramKey += '__neq';
+          else if (fieldConfig.operator === '不包�?) paramKey += '__not';
           else if (fieldConfig.operator === '精确匹配') paramKey += '__eq';
         }
         params[paramKey] = searchForm.value[key];
@@ -976,10 +977,10 @@ const fetchData = async (isPolling = false) => {
 };
 
 // ==========================================
-// 💥 导出站点：1:1 对齐导出纯文本文件流
+// 💥 导出站点�?:1 对齐导出纯文本文件流
 // ==========================================
 // ==========================================
-// 💥 智能导出：自动识别当前 Tab 导出纯文本
+// 💥 智能导出：自动识别当�?Tab 导出纯文�?
 // ==========================================
 const handleExport = async () => {
   const config = tabConfig[activeTab.value];
@@ -997,8 +998,8 @@ const handleExport = async () => {
         if (fieldConfig && fieldConfig.hasOperatorSelect) {
           if (fieldConfig.operator === '大于') paramKey += '__gt';
           else if (fieldConfig.operator === '小于') paramKey += '__lt';
-          else if (fieldConfig.operator === '不等于') paramKey += '__neq';
-          else if (fieldConfig.operator === '不包含') paramKey += '__not';
+          else if (fieldConfig.operator === '不等�?) paramKey += '__neq';
+          else if (fieldConfig.operator === '不包�?) paramKey += '__not';
           else if (fieldConfig.operator === '精确匹配') paramKey += '__eq';
         }
         params[paramKey] = searchForm.value[key];
@@ -1025,21 +1026,21 @@ const handleExport = async () => {
     message.success({ content: `${config.exportName}导出成功！`, key: 'export_data', duration: 2 });
   } catch (error) {
     console.error('导出异常:', error);
-    message.error({ content: '导出异常，请查看控制台', key: 'export_data', duration: 2 });
+    message.error({ content: '导出异常，请查看控制�?, key: 'export_data', duration: 2 });
   }
 };
 
 // 💥 核心修改 4：通用批量删除函数
-// 💥 核心修复：增加 null/undefined 过滤机制
+// 💥 核心修复：增�?null/undefined 过滤机制
 const handleBatchDelete = () => {
   if (!hasSelected.value) return;
 
-  // 1. 数据消杀：过滤掉数组中的 undefined 和 null，拿到真正纯净的 ID
+  // 1. 数据消杀：过滤掉数组中的 undefined �?null，拿到真正纯净�?ID
   const validKeys = selectedRowKeys.value.filter(key => key != null);
 
   // 2. 如果过滤后全是空的，说明 rowKey 绑定失败，直接拦截并弹窗警告
   if (validKeys.length === 0) {
-    message.error('未能获取到有效的资产ID，请按 F12 检查接口返回的字段名！');
+    message.error('未能获取到有效的资产ID，请�?F12 检查接口返回的字段名！');
     return;
   }
 
@@ -1052,19 +1053,19 @@ const handleBatchDelete = () => {
   Modal.confirm({
     title: '操作确认',
     icon: createVNode(ExclamationCircleOutlined),
-    content: `确认要删除选中的 ${validKeys.length} 项资产吗？`,
+    content: `确认要删除选中�?${validKeys.length} 项资产吗？`,
     okText: '确认',
     cancelText: '取消',
     onOk: async () => {
       try {
-        // 3. 将干净的有效 ID 数组发送给后端
+        // 3. 将干净的有�?ID 数组发送给后端
         const res = await request.post(config.deleteUrl, {
           _id: validKeys
         });
 
         if (res.code === 200) {
           message.success(`成功删除 ${validKeys.length} 项资产！`);
-          selectedRowKeys.value = []; // 清空勾选
+          selectedRowKeys.value = []; // 清空勾�?
           fetchData(); // 重新拉取表格数据更新界面
         } else {
           message.error('删除失败: ' + (res.message || '未知错误'));
@@ -1092,14 +1093,14 @@ const handleTableChange = (page, pageSize) => {
   fetchData();
 };
 
-// 💡 新增：任务日志自动刷新机制
+// 💡 新增：任务日志自动刷新机�?
 let syslogTimer = null;
 
 const startSyslogTimer = () => {
   if (syslogTimer) clearInterval(syslogTimer);
   syslogTimer = setInterval(() => {
     fetchData(true);
-  }, 5000); // 每 5 秒拉取一次最新日志
+  }, 5000); // �?5 秒拉取一次最新日�?
 };
 
 const stopSyslogTimer = () => {
@@ -1109,7 +1110,7 @@ const stopSyslogTimer = () => {
   }
 };
 
-// 💡 新增：全局任务状态轮询，用于实时更新 Tab 栏计数值
+// 💡 新增：全局任务状态轮询，用于实时更新 Tab 栏计数�?
 let taskStatusTimer = null;
 
 const fetchTaskStats = async () => {
@@ -1140,16 +1141,16 @@ const fetchTaskStats = async () => {
       }
     }
   } catch (err) {
-    console.error('拉取任务全局状态失败:', err);
+    console.error('拉取任务全局状态失�?', err);
   }
 };
 
 const startTaskStatusTimer = () => {
   if (!query.task_id) return;
-  fetchTaskStats(); // 初始拉取一次
+  fetchTaskStats(); // 初始拉取一�?
   taskStatusTimer = setInterval(() => {
     fetchTaskStats();
-  }, 5000); // 每 5 秒更新一次导航栏计数
+  }, 5000); // �?5 秒更新一次导航栏计数
 };
 
 const stopTaskStatusTimer = () => {
@@ -1190,7 +1191,7 @@ onUnmounted(() => {
 });
 
 // ==========================================
-// 💥 风险任务下发：生成临时集合、拉取策略、下发任务
+// 💥 风险任务下发：生成临时集合、拉取策略、下发任�?
 // ==========================================
 const riskVisible = ref(false);
 const riskSubmitLoading = ref(false);
@@ -1203,7 +1204,7 @@ const currentResultSetId = ref('');
 const openRiskModal = async () => {
   targetCount.value = hasSelected.value ? selectedRowKeys.value.length : pagination.total;
   if (targetCount.value === 0) {
-    message.warning('当前没有可下发的资产目标！');
+    message.warning('当前没有可下发的资产目标�?);
     return;
   }
 
@@ -1211,7 +1212,7 @@ const openRiskModal = async () => {
   riskForm.name = '';
   currentResultSetId.value = '';
 
-  message.loading({ content: '正在打包资产并拉取策略...', key: 'risk_prepare' });
+  message.loading({ content: '正在打包资产并拉取策�?..', key: 'risk_prepare' });
 
   try {
     const policyPromise = request.get('/policy/', { params: { size: 1000 } });
@@ -1252,11 +1253,11 @@ const openRiskModal = async () => {
     riskVisible.value = true;
   } catch (error) {
     console.error('准备风险任务异常:', error);
-    message.error({ content: '准备数据失败，请查看控制台', key: 'risk_prepare', duration: 2 });
+    message.error({ content: '准备数据失败，请查看控制�?, key: 'risk_prepare', duration: 2 });
   }
 };
 
-// 2. 监听下拉框选择，自动拼装任务名称
+// 2. 监听下拉框选择，自动拼装任务名�?
 const handlePolicyChange = (val, option) => {
   if (option) {
     riskForm.name = `风险巡航任务-${option.label}`;
@@ -1266,11 +1267,11 @@ const handlePolicyChange = (val, option) => {
 // 3. 确定下发任务
 const submitRiskTask = async () => {
   if (!riskForm.policy_id || !riskForm.name) {
-    message.warning('请选择策略并输入任务名称');
+    message.warning('请选择策略并输入任务名�?);
     return;
   }
   if (!currentResultSetId.value) {
-    message.error('未能获取到资产集合 ID，请关闭弹窗重试');
+    message.error('未能获取到资产集�?ID，请关闭弹窗重试');
     return;
   }
 
@@ -1307,7 +1308,7 @@ const submitRiskTask = async () => {
 .site-header { line-height: 1.5; }
 .site-img { width: 16px; height: 16px; margin-right: 8px; vertical-align: middle; }
 .site-word { color: var(--arl-text-color); opacity: 0.45; font-size: 12px; margin: 4px 0; }
-/* 完美复刻原版的 "添加标签" 按钮 (灰色虚线框) */
+/* 完美复刻原版�?"添加标签" 按钮 (灰色虚线�? */
 .add-tag {
   color: var(--arl-text-color);
   cursor: pointer;
@@ -1331,14 +1332,14 @@ const submitRiskTask = async () => {
 
 /* ================= Headers 样式 ================= */
 .scroll-x {
-  /* 🚨 核心修复：删除了 max-height，让内容自然撑开表格的高度 */
+  /* 🚨 核心修复：删除了 max-height，让内容自然撑开表格的高�?*/
   background: transparent;
   border: none;
   padding: 8px;
   width: 100%;
-  max-width: 600px; /* 保持最大宽度，防止撑破整个表格列 */
-  overflow-x: auto; /* 单行太长时，出现横向滚动条 */
-  overflow-y: hidden; /* 绝对禁止内部出现垂直滚动条 */
+  max-width: 600px; /* 保持最大宽度，防止撑破整个表格�?*/
+  overflow-x: auto; /* 单行太长时，出现横向滚动�?*/
+  overflow-y: hidden; /* 绝对禁止内部出现垂直滚动�?*/
 }
 
 .scroll-x pre {
@@ -1350,7 +1351,7 @@ const submitRiskTask = async () => {
   font-size: 12px;
   line-height: 1.5;
   color: var(--arl-text-color); opacity: 0.65;
-  white-space: pre; /* 🚨 核心修复：强制不换行，这是触发横向滚动条的关键 */
+  white-space: pre; /* 🚨 核心修复：强制不换行，这是触发横向滚动条的关�?*/
   word-wrap: normal;
 }
 
@@ -1385,11 +1386,11 @@ const submitRiskTask = async () => {
 :deep(.ant-tabs-tab:hover) {
   
 }
-/* ================= 6. 站点列细节补充 ================= */
+/* ================= 6. 站点列细节补�?================= */
 /* 完美复刻 Favicon Hash 的次级文本灰色与紧凑间距 */
-/* 修复 Favicon Hash 发虚的问题：恢复原版字号和深色 */
+/* 修复 Favicon Hash 发虚的问题：恢复原版字号和深�?*/
 .site-word {
-  color: var(--arl-text-color) !important; /* 恢复为标准的深黑色，去掉导致发虚的浅灰 */
+  color: var(--arl-text-color) !important; /* 恢复为标准的深黑色，去掉导致发虚的浅�?*/
   font-size: 14px !important;            /* 恢复标准字号，不缩小 */
   margin-top: 4px;
   margin-bottom: 0;

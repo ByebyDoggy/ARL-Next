@@ -618,6 +618,7 @@ from .cdn_dict import ns as cdn_dict_ns
 from .system_config import ns as system_config_ns
 from .icp import ns as icp_ns
 from .brute_dict import ns as brute_dict_ns
+from .js_analysis import ns as js_analysis_ns
 
 
 from .assetCert import ns as asset_cert_ns

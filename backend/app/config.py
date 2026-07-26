@@ -316,6 +316,40 @@ try:
         if y["WXWORK"].get("WEBHOOK_URL"):
             Config._WX_WORK_WEBHOOK = y["WXWORK"]["WEBHOOK_URL"]
 
+    # *** JS 深度分析配置 ***
+    if y.get("JS_ANALYSIS"):
+        jc = y["JS_ANALYSIS"]
+        Config.JS_ANALYSIS_ENABLED = jc.get("ENABLED", True)
+        Config.JS_ANALYSIS_CONCURRENCY = jc.get("CONCURRENCY", 3)
+        Config.JS_ANALYSIS_TIMEOUT = jc.get("TIMEOUT", 600)
+        Config.JS_ANALYSIS_SOURCEMAP = jc.get("SOURCEMAP_ENABLED", True)
+        Config.JS_ANALYSIS_ROUTE = jc.get("ROUTE_ANALYSIS", True)
+        Config.JS_ANALYSIS_ADMIN = jc.get("ADMIN_DETECT", True)
+        Config.JS_ANALYSIS_MAX_PER_SITE = jc.get("MAX_JS_PER_SITE", 50)
+        Config.JS_ANALYSIS_MAX_SIZE = jc.get("MAX_JS_SIZE_MB", 5) * 1024 * 1024
+    else:
+        Config.JS_ANALYSIS_ENABLED = True
+        Config.JS_ANALYSIS_CONCURRENCY = 3
+        Config.JS_ANALYSIS_TIMEOUT = 600
+        Config.JS_ANALYSIS_SOURCEMAP = True
+        Config.JS_ANALYSIS_ROUTE = True
+        Config.JS_ANALYSIS_ADMIN = True
+        Config.JS_ANALYSIS_MAX_PER_SITE = 50
+        Config.JS_ANALYSIS_MAX_SIZE = 5 * 1024 * 1024
+
+    # *** 循环收敛配置 ***
+    if y.get("CONVERGENCE"):
+        cc = y["CONVERGENCE"]
+        Config.CONVERGENCE_ENABLED = cc.get("ENABLED", False)
+        Config.CONVERGENCE_MAX_ROUNDS = cc.get("MAX_ROUNDS", 3)
+        Config.CONVERGENCE_MIN_NEW = cc.get("MIN_NEW_ASSETS", 5)
+        Config.CONVERGENCE_RATIO = cc.get("NEW_RATIO_THRESHOLD", 0.05)
+    else:
+        Config.CONVERGENCE_ENABLED = False
+        Config.CONVERGENCE_MAX_ROUNDS = 3
+        Config.CONVERGENCE_MIN_NEW = 5
+        Config.CONVERGENCE_RATIO = 0.05
+
 except Exception as e:
     print("Parse config.yaml error {}".format(e))
     sys.exit(-1)

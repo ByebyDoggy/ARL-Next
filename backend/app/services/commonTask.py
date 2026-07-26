@@ -91,6 +91,7 @@ class CommonTask(object):
         self.insert_cip_stat()
         self.insert_task_stat()
         self.sync_asset()
+        # 收敛轮次日志由 domain.py run() 内部通过 update_task_field("round_info", ...) 直接写入
 
 
 # *** 对用户提交的站点或者是发现的站点进行后续处理

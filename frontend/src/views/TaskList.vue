@@ -721,7 +721,14 @@ const pluginCategories = [
       { key: 'file_leak', label: '文件泄露' },
       { key: 'findvhost', label: 'Host 碰撞' },
       { key: 'npoc_service_detection', label: '服务(python)识别' },
-      { key: 'nuclei_scan', label: 'nuclei 调用' }
+      { key: 'nuclei_scan', label: 'nuclei 调用' },
+      { key: 'js_analysis', label: 'JS 深度分析' }
+    ]
+  },
+  {
+    title: '🔄 循环收敛（默认关闭）',
+    plugins: [
+      { key: 'convergence_enabled', label: '启用收敛' }
     ]
   }
 ];
@@ -735,7 +742,8 @@ const defaultPlugins = {
   port_scan: true, service_detection: false, os_detection: false, ssl_cert: false,
   skip_scan_cdn_ip: true, site_identify: false, search_engines: false, site_spider: false,
   file_leak: false, findvhost: false, nuclei_scan: false, web_info_hunter: false,
-  npoc_service_detection: false
+  npoc_service_detection: false, js_analysis: false,
+  convergence_enabled: false
 };
 
 // === 3. 表单状态初始化（不再依赖任何废弃变量） ===

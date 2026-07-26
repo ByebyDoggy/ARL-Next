@@ -3,6 +3,7 @@ from .baseInfo import BaseInfo
 from .domainInfo import DomainInfo
 from .pageInfo import PageInfo
 from .wihRecord import WihRecord
+from .jsAnalysis import JsEndpoint, JsSourceMap, JsRoute, JsConfigItem, JsReport
 from app.config import Config
 
 import os
