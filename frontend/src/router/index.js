@@ -27,14 +27,14 @@ const routes = [
             if (!token) {
                 return next('/login')
             }
-            // 真正发起一次轻量级请求校验 Token，而不是无脑信�?localStorage
+            // 真正发起一次轻量级请求校验 Token，而不是无脑信任 localStorage
             try {
-                // 动态导�?request 防止循环依赖，或者直接在顶部 import
+                // 动态导入 request 防止循环依赖，或者直接在顶部 import
                 const { default: request } = await import('../utils/request.js');
                 await request.get('/api/system_config/local_version');
                 next();
             } catch (error) {
-                // 请求失败（如 401 报错），清除无效 token 并拦在门�?
+                // 请求失败（如 401 报错），清除无效 token 并拦在门外
                 localStorage.removeItem('token');
                 localStorage.removeItem('userInfo');
                 next('/login');
@@ -45,7 +45,7 @@ const routes = [
                 path: 'dashboard',
                 name: 'Dashboard',
                 component: () => import('../views/Dashboard.vue'),
-                meta: { title: '仪表�? }
+                meta: { title: '仪表盘' }
             },
             {
                 path: 'taskList',
@@ -53,7 +53,7 @@ const routes = [
                 component: () => import('../views/TaskList.vue')
             },
             {
-                // 新增详情页路�?
+                // 新增详情页路由
                 path: 'taskList/taskDetail',
                 name: 'TaskDetail',
                 component: () => import('../views/TaskDetail.vue')
@@ -63,7 +63,7 @@ const routes = [
                 path: '/asset-search',
                 name: 'AssetSearch',
                 component: () => import('../views/AssetSearch.vue'), // 指向你刚才新建的文件
-                meta: { title: '资产搜索' } // 可选：如果有面包屑或页面标题依�?meta，可以加�?
+                meta: { title: '资产搜索' } // 可选：如果有面包屑或页面标题依赖 meta，可以加上
             },
             {
                 // 🚨 核心修改：将 '/asset-monitor' 改为 '/assetsMonitor'
@@ -85,7 +85,7 @@ const routes = [
                 component: () => import('../views/GroupAssetsDetail.vue'),
                 meta: { title: '资产分组详情' }
             },
-            // 在你�?routes 数组中添加：
+            // 在你的 routes 数组中添加：
 // 找到你之前加 /policy 的地方，紧挨着追加这一段：
             {
                 path: '/policy',
@@ -105,14 +105,14 @@ const routes = [
                 meta: { title: '指纹管理' }
             },
             {
-                path: '/pocList', // 请确保这和你菜单配置的路径一�?
+                path: '/pocList', // 请确保这和你菜单配置的路径一致
                 name: 'PocList',
                 component: () => import('../views/PocList.vue'),
                 meta: { title: 'PoC信息' }
             },
 
             {
-                path: '/planningTasks', // 请确保这和你菜单配置的路径一�?
+                path: '/planningTasks', // 请确保这和你菜单配置的路径一致
                 name: 'PlanningTasks',
                 component: () => import('../views/PlanningTasks.vue'),
                 meta: { title: '计划任务' }
@@ -126,13 +126,13 @@ const routes = [
                 meta: { title: 'GitHub监控' }
             },
             {
-                path: '/GitHubTasks/GitHubTasksInfo', // 这个路径必须和列表页跳转时写的一模一�?
+                path: '/GitHubTasks/GitHubTasksInfo', // 这个路径必须和列表页跳转时写的一模一样
                 name: 'GitHubTasksInfo',
                 component: () => import('../views/GitHubTasksInfo.vue'), // 这里的组件文件名大小写必须和实际文件一字不差！
                 meta: { title: 'GitHub 任务详情' }
             },
             {
-                path: '/GitHubMonitor/GitHubMonitorInfo', // 这个路径必须和列表页跳转时写的一模一�?
+                path: '/GitHubMonitor/GitHubMonitorInfo', // 这个路径必须和列表页跳转时写的一模一样
                 name: 'GitHubMonitorInfo',
                 component: () => import('../views/GitHubMonitorInfo.vue'), // 这里的组件文件名大小写必须和实际文件一字不差！
                 meta: { title: 'GitHub 监控详情' }
@@ -154,7 +154,13 @@ const routes = [
                 name: 'AssetReconDetail',
                 component: () => import('../views/AssetReconDetail.vue'),
                 meta: { title: '企业信息资产详情' }
-            }
+            },
+            {
+                path: '/js-analysis-report',
+                name: 'JsAnalysisReport',
+                component: () => import('../views/JsAnalysisReport.vue'),
+                meta: { title: 'JS分析报告' }
+            },
         ]
 
 
