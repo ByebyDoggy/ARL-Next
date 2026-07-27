@@ -390,7 +390,9 @@ const mcpConfigJson = ref('');
 
 const handleShowMcpModal = () => {
   const token = localStorage.getItem('token') || 'YOUR_API_TOKEN';
-  const host = window.location.origin;
+  const loc = window.location;
+  const apiPort = loc.port === '5173' ? '5001' : loc.port;
+  const host = loc.protocol + '//' + loc.hostname + ':' + apiPort;
   const config = {
     "ARL-Next": {
       "command": "docker",
