@@ -102,13 +102,29 @@
       title="🚀 AI 助手 (MCP) 一键接入"
       @cancel="showMcpModal = false"
       :footer="null"
-      width="600px"
+      width="640px"
       wrapClassName="arl-theme-modal"
       rootClassName="arl-theme-modal"
   >
     <div style="margin-bottom: 16px;">
       <p>想要使用 Cursor、Claude Desktop 或其他 AI 工具自动分析平台资产与漏洞？</p>
-      <p>请复制以下配置，粘贴到您的 AI 客户端配置文件的 <code>"mcpServers"</code> 节点内部：</p>
+      <p>请选择传输模式，然后复制配置粘贴到 AI 客户端配置文件的 <code>"mcpServers"</code> 节点：</p>
+    </div>
+    <div style="margin-bottom: 16px; text-align: center;">
+      <a-radio-group v-model:value="mcpMode" button-style="solid" @change="generateMcpConfig">
+        <a-radio-button value="stdio">
+          <span style="font-size: 15px; margin-right: 4px;">🐳</span> Docker (Stdio)
+        </a-radio-button>
+        <a-radio-button value="sse">
+          <span style="font-size: 15px; margin-right: 4px;">🌐</span> HTTP (SSE)
+        </a-radio-button>
+      </a-radio-group>
+    </div>
+    <div v-if="mcpMode === 'sse'" style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <span style="font-size: 13px;">SSE 服务器地址：</span>
+      <a-input v-model:value="sseHost" style="width: 200px;" size="small" placeholder="http://localhost" @change="generateMcpConfig" />
+      <span style="font-size: 13px;">端口：</span>
+      <a-input-number v-model:value="ssePort" :min="1024" :max="65535" size="small" style="width: 80px;" @change="generateMcpConfig" />
     </div>
     <div style="position: relative;">
       <pre :style="{ background: hasBgImage ? 'rgba(0,0,0,0.2)' : 'var(--arl-bg-light)', padding: '16px', borderRadius: '4px', overflowX: 'auto', fontSize: '13px', border: hasBgImage ? '1px solid rgba(255,255,255,0.1)' : 'none' }"><code :style="{ color: hasBgImage ? 'var(--arl-text-color)' : 'inherit' }">{{ mcpConfigJson }}</code></pre>
@@ -117,9 +133,12 @@
         <a-button type="primary" size="small" @click="copyMcpConfig">复制配置</a-button>
       </div>
     </div>
-    <p style="margin-top: 16px; font-size: 12px; color: var(--arl-text-color); opacity: 0.45;">
-      注：该配置包含您的专属 API Token，请妥善保管。底层采用 <code>docker</code> 运行，请确保本地已安装并启动 Docker。
-    </p>
+    <div v-if="mcpMode === 'stdio'" style="margin-top: 16px; font-size: 12px; color: var(--arl-text-color); opacity: 0.65;">
+      <span>⚡ Stdio 模式：每次调用拉起短生命周期容器，调用结束即销毁。需先构建镜像：<code>docker build -t arl-next-mcp:latest ./mcp-server</code>。配置包含 API Token，请妥善保管。</span>
+    </div>
+    <div v-else style="margin-top: 16px; font-size: 12px; color: var(--arl-text-color); opacity: 0.65;">
+      <span>🌐 SSE 模式：MCP 服务器以持久化 HTTP 服务运行，适合 IDE 插件和远程客户端。部署命令：<code style="word-break: break-all;">docker run -d --name arl-next-mcp -p {{ ssePort }}:{{ ssePort }} -e ARL_HOST={{ apiHost }} -e ARL_TOKEN=... -e SSE=true -e PORT={{ ssePort }} arl-next-mcp:latest</code>（需先构建镜像）</span>
+    </div>
   </a-modal>
 
   <a-modal
@@ -384,37 +403,57 @@ const handleCancelChangePass = () => {
   passFormRef.value?.resetFields();
 };
 
-/* ---------- 新增：MCP 接入逻辑 ---------- */
+/* ---------- MCP 接入逻辑（支持 Stdio / SSE 双模式） ---------- */
 const showMcpModal = ref(false);
 const mcpConfigJson = ref('');
+const mcpMode = ref('stdio');
+const ssePort = ref(3100);
+const sseHost = ref('');
 
-const handleShowMcpModal = () => {
-  const token = localStorage.getItem('token') || 'YOUR_API_TOKEN';
+const apiHost = computed(() => {
   const loc = window.location;
   const apiPort = loc.port === '5173' ? '5001' : loc.port;
-  const host = loc.protocol + '//' + loc.hostname + ':' + apiPort;
-  const config = {
-    "ARL-Next": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "ARL_HOST",
-        "-e",
-        "ARL_TOKEN",
-        "arl-next-mcp:latest"
-      ],
-      "env": {
-        "ARL_HOST": host,
-        "ARL_TOKEN": token
+  return loc.protocol + '//' + loc.hostname + ':' + apiPort;
+});
+
+function generateMcpConfig() {
+  const token = localStorage.getItem('token') || 'YOUR_API_TOKEN';
+  let config;
+  if (mcpMode.value === 'sse') {
+    const host = sseHost.value || apiHost.value;
+    config = {
+      "ARL-Next": {
+        "url": host + ':' + ssePort.value + '/sse'
       }
-    }
-  };
-  // 去除最外层的 {} 使其更容易直接粘贴到已有的 mcpServers 对象内部
+    };
+  } else {
+    config = {
+      "ARL-Next": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "-e",
+          "ARL_HOST",
+          "-e",
+          "ARL_TOKEN",
+          "arl-next-mcp:latest"
+        ],
+        "env": {
+          "ARL_HOST": apiHost.value,
+          "ARL_TOKEN": token
+        }
+      }
+    };
+  }
   const jsonStr = JSON.stringify(config, null, 2);
   mcpConfigJson.value = jsonStr.substring(2, jsonStr.length - 2).trim();
+}
+
+const handleShowMcpModal = () => {
+  sseHost.value = apiHost.value;
+  generateMcpConfig();
   showMcpModal.value = true;
 };
 
@@ -438,7 +477,7 @@ const refreshMcpToken = async () => {
     if (res.code === 200 && res.data && res.data.token) {
       localStorage.setItem('token', res.data.token);
       message.success('Token 已作废并刷新成功，配置已自动更新！');
-      handleShowMcpModal(); // 重新生成配置展示
+      generateMcpConfig(); // 重新生成配置展示
     } else {
       message.error(res.message || '刷新 Token 失败');
     }
