@@ -1,13 +1,14 @@
 {
   "name": "arl-next-mcp",
   "version": "1.0.0",
-  "description": "ARL-Next MCP Server",
+  "description": "ARL-Next MCP Server (stdio + SSE)",
   "main": "index.js",
   "bin": {
     "arl-next-mcp": "index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "start:sse": "node index.js --sse"
   },
   "keywords": [
     "mcp",
@@ -19,6 +20,8 @@
   "type": "commonjs",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "axios": "^1.18.1"
+    "axios": "^1.18.1",
+    "cors": "^2.8.5",
+    "express": "^4.21.0"
   }
 }

@@ -2,19 +2,19 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# 仅拷贝包配置并安装依赖，利用 Docker 构建缓存
+# 拷贝包配置并安装依赖
 COPY package*.json ./
 RUN npm ci --only=production
 
 # 拷贝源代码
 COPY index.js ./
-
-# 设置权限
 RUN chmod +x index.js
 
-# 设置环境变量的默认值（可选）
+# 默认环境变量
 ENV ARL_HOST=""
 ENV ARL_TOKEN=""
+ENV SSE=""
+ENV PORT="3100"
 
-# 使用 node 直接运行
+# 默认使用 stdio 模式；传 --sse 或 SSE=true 开启 HTTP SSE 模式
 ENTRYPOINT ["node", "index.js"]
