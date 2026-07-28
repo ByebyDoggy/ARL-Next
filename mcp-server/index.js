@@ -244,7 +244,7 @@ async function runSse() {
 
   const app = express();
   app.use(cors());
-  app.use(express.json());
+  // 注意：不使用 express.json()，因为 MCP SDK 的 handlePostMessage 通过 raw stream 读取请求体
 
   // 存储活跃会话 { sessionId -> { server, transport } }
   const sessions = {};
