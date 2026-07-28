@@ -423,7 +423,11 @@ function generateMcpConfig() {
     const host = sseHost.value || apiHost.value;
     config = {
       "ARL-Next": {
-        "url": host + ':' + ssePort.value + '/sse?token=' + token
+        "type": "sse",
+        "url": host + ':' + ssePort.value + '/sse',
+        "headers": {
+          "Authorization": "Bearer " + token
+        }
       }
     };
   } else {
