@@ -137,7 +137,7 @@
       <span>⚡ Stdio 模式：每次调用拉起短生命周期容器，调用结束即销毁。需先构建镜像：<code>docker build -t arl-next-mcp:latest ./mcp-server</code>。配置包含 API Token，请妥善保管。</span>
     </div>
     <div v-else style="margin-top: 16px; font-size: 12px; color: var(--arl-text-color); opacity: 0.65;">
-      <span>🌐 SSE 模式：MCP 服务器以持久化 HTTP 服务运行，适合 IDE 插件和远程客户端。部署命令：<code style="word-break: break-all;">docker run -d --name arl-next-mcp -p {{ ssePort }}:{{ ssePort }} -e ARL_HOST={{ apiHost }} -e ARL_TOKEN=... -e SSE=true -e PORT={{ ssePort }} arl-next-mcp:latest</code>（需先构建镜像）</span>
+      <span>🌐 SSE 模式：MCP Server 持久化运行在 VPS Docker 中，AI 客户端通过网络连接。需先在 VPS 上部署：<code style="word-break: break-all;">docker run -d --name arl-next-mcp --network arl-next-prod_arl-net -p {{ ssePort }}:{{ ssePort }} -e ARL_HOST=http://arl-web:5000 -e ARL_TOKEN=你的Token -e SSE=true -e PORT={{ ssePort }} arl-next-mcp:latest</code>。注意 URL 已内嵌 Token 鉴权，请妥善保管。</span>
     </div>
   </a-modal>
 
@@ -423,7 +423,7 @@ function generateMcpConfig() {
     const host = sseHost.value || apiHost.value;
     config = {
       "ARL-Next": {
-        "url": host + ':' + ssePort.value + '/sse'
+        "url": host + ':' + ssePort.value + '/sse?token=' + token
       }
     };
   } else {
@@ -452,7 +452,8 @@ function generateMcpConfig() {
 }
 
 const handleShowMcpModal = () => {
-  sseHost.value = apiHost.value;
+  const loc = window.location;
+  sseHost.value = loc.protocol + '//' + loc.hostname;
   generateMcpConfig();
   showMcpModal.value = true;
 };

@@ -38,14 +38,75 @@
 ```
 *注：初次使用需先构建本地镜像：在 `mcp-server` 目录下执行 `docker build -t arl-next-mcp:latest .`。*
 
-### 模式二：SSE（持久化 HTTP 服务）
+### 模式二：SSE（持久化 HTTP 服务，推荐）
 
-适用于 **IDE 插件、远程客户端** 或需要持久连接的场景。MCP 服务器以 HTTP 服务形式运行，通过 SSE（Server-Sent Events）与客户端通信。
+#### 架构说明
 
-**启动方式：**
+MCP Server 与 ARL 项目部署在**同一台 VPS 的 Docker 网络**中，通过 SSE 协议为远程客户端提供服务：
+
+```
+AI 客户端 (Cursor/Claude Desktop/etc.)
+       │  SSE over HTTPS
+       ▼
+VPS ┌─────────────────────────────────────────┐
+    │  arl-frontend  (端口 5173)               │
+    │  arl-web       (内网 arl-web:5000)       │
+    │  arl-mcp       (端口 3100) ← MCP Server  │
+    │                     └─ 连接内网 ARL API   │
+    └─────────────────────────────────────────┘
+```
+
+#### 部署方式
+
+**步骤 1：在 VPS 上构建镜像**
 
 ```bash
-# 直接运行（本地开发）
+# 进入项目目录（VPS 上已拉取代码）
+cd ~/ARL-Next/mcp-server
+docker build -t arl-next-mcp:latest .
+```
+
+**步骤 2：启动 SSE 容器（加入 ARL Docker 网络）**
+
+```bash
+docker run -d --name arl-next-mcp \
+  --network arl-next-prod_arl-net \
+  -p 3100:3100 \
+  -e ARL_HOST=http://arl-web:5000 \
+  -e ARL_TOKEN="您的_API_TOKEN" \
+  -e SSE=true \
+  -e PORT=3100 \
+  arl-next-mcp:latest
+```
+
+> **关键说明：**
+> - `--network arl-next-prod_arl-net` 让 MCP 容器与 ARL 服务同网络，可直接通过容器名访问
+> - `ARL_HOST=http://arl-web:5000` 指向 Docker 内网的 ARL Web 服务
+> - `ARL_TOKEN` 需与 ARL 系统的 API Token 一致（即登录后生成的 Token）
+
+**步骤 3：验证部署**
+
+```bash
+curl http://localhost:3100/health
+# 返回: {"status":"ok","mode":"sse","activeSessions":0,"tools":6}
+```
+
+#### 客户端配置
+
+从 ARL 前端页面（右上角「AI 助手接入」）选择 **HTTP (SSE)** 模式，复制生成的配置。URL 已自动内嵌 Token 鉴权：
+
+```json
+"ARL-Next": {
+  "url": "http://[VPS-IP]:3100/sse?token=您的_API_TOKEN"
+}
+```
+
+> **安全说明：** SSE 端点的 `/sse` 接口会验证 `token` 参数，无效 Token 返回 401。Token 通过 URL 传递，建议在生产环境使用 HTTPS 反向代理保护外层连接。**健康检查 `/health` 无需鉴权。**
+
+#### 本地开发启动
+
+```bash
+# 直接运行
 node index.js --sse
 
 # 或通过环境变量
@@ -56,36 +117,6 @@ PORT=3200 node index.js --sse
 
 # 通过 npm script
 npm run start:sse
-```
-
-**Docker 运行：**
-
-```bash
-# 启动 SSE 模式容器
-docker run -d --name arl-next-mcp-sse \
-  -p 3100:3100 \
-  -e ARL_HOST="https://[您的服务器IP或域名]:5000" \
-  -e ARL_TOKEN="您的_API_TOKEN" \
-  -e SSE=true \
-  arl-next-mcp:latest
-```
-
-**AI 客户端配置（SSE）：**
-
-```json
-"ARL-Next": {
-  "url": "http://localhost:3100/sse",
-  "type": "sse"
-}
-```
-
-> *提醒：SSE 模式下，请确保 `ARL_HOST` 中的地址是 MCP 服务器**能访问到** ARL 后端 API 的地址（如果 MCP 和 ARL 在同一台服务器上，使用 `http://localhost:5001`）。*
-
-**健康检查：**
-
-```bash
-curl http://localhost:3100/health
-# 返回: {"status":"ok","mode":"sse","activeSessions":2,"tools":6}
 ```
 
 ---

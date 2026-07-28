@@ -257,7 +257,7 @@ async function runStdio() {
 }
 
 // ============================================================
-// SSE 模式（Express HTTP 服务器）
+// SSE 模式（Express HTTP 服务器，含 Token 鉴权）
 // ============================================================
 async function runSse() {
   const express = require("express");
@@ -271,8 +271,22 @@ async function runSse() {
   // 存储活跃的 SSE 会话
   const transports = {};
 
-  // SSE 端点：MCP 客户端建立长连接
-  app.get("/sse", async (req, res) => {
+  // Token 鉴权中间件
+  function authMiddleware(req, res, next) {
+    // 优先查 query 参数，其次查 Authorization 头
+    const token = req.query.token || (req.headers.authorization && req.headers.authorization.replace(/^Bearer\s+/i, ""));
+    if (!token || token !== process.env.ARL_TOKEN) {
+      return res.status(401).json({ error: "Unauthorized: invalid or missing token" });
+    }
+    next();
+  }
+
+  // SSE 端点（需携带 Token）
+  app.get("/sse", authMiddleware, async (req, res) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
     const transport = new SSEServerTransport("/messages", res);
     transports[transport.sessionId] = transport;
     res.on("close", () => {
