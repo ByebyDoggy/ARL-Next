@@ -1263,8 +1263,9 @@ def resume_task(task_id):
 
     checkpoint = task_data.get("checkpoint")
     if not checkpoint:
-        logger.warning("resume_task: task {} has no checkpoint data".format(task_id))
-        return
+        msg = "resume_task: task {} has no checkpoint data (may have been started before the checkpoint feature)".format(task_id)
+        logger.warning(msg)
+        raise Exception(msg)
 
     # 重置状态为 resumed，清除 end_time，重新派发 DOMAIN_TASK（DomainTask 构造时自动读取 checkpoint）
     utils.conn_db('task').update_one(
@@ -1275,11 +1276,13 @@ def resume_task(task_id):
 
     task_options = {
         "celery_action": CeleryAction.DOMAIN_TASK,
-        "data": task_data.get("options", {})
+        "data": {
+            "task_id": task_id,
+            "target": checkpoint.get("original_target", task_data.get("target", "")),
+            "name": task_data.get("name", ""),
+            "options": task_data.get("options", {}),
+        }
     }
-    task_options["data"]["task_id"] = task_id
-    task_options["data"]["name"] = task_data.get("name", "")
-    task_options["data"]["target"] = checkpoint.get("original_target", task_data.get("target", ""))
 
     celery_id = celerytask.arl_task.apply_async(
         kwargs={'options': task_options},
