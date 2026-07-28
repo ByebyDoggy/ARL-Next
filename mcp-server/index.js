@@ -264,14 +264,15 @@ async function runSse() {
       httpsAgent: new https.Agent({ rejectUnauthorized: false }),
     });
 
-    validator.get("/dashboard/stats").then(() => {
-      req.clientToken = token;
-      next();
-    }).catch((err) => {
-      if (err.response && err.response.status === 401) {
-        return res.status(401).json({ error: "Unauthorized: invalid token" });
+    validator.get("/dashboard/stats").then((resp) => {
+      // ARL API 统一返回 HTTP 200，鉴权结果在 body.code 中
+      if (resp.data && resp.data.code === 200) {
+        req.clientToken = token;
+        return next();
       }
-      // ARL 不可达时回退到环境变量比对
+      return res.status(401).json({ error: "Unauthorized: invalid token" });
+    }).catch((err) => {
+      // ARL 网络不可达时回退到环境变量比对
       if (token === envToken) {
         req.clientToken = token;
         return next();
