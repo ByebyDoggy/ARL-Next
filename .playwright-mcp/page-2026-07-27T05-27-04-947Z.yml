@@ -1,0 +1,369 @@
+- generic [ref=e4]:
+  - generic [ref=e6]:
+    - complementary [ref=e7]:
+      - generic [ref=e8]:
+        - generic "点击隐藏/显示界面" [ref=e9] [cursor=pointer]:
+          - img "deployment-unit" [ref=e10]:
+            - img [ref=e11]
+          - generic [ref=e13]: ARL-Next
+        - menu [ref=e14]:
+          - menuitem "dashboard 仪表盘" [ref=e15] [cursor=pointer]:
+            - generic [ref=e16]:
+              - img "dashboard" [ref=e17]:
+                - img [ref=e18]
+              - text: 仪表盘
+          - menuitem "search 企业资产查询" [ref=e20] [cursor=pointer]:
+            - generic [ref=e21]:
+              - img "search" [ref=e22]:
+                - img [ref=e23]
+              - text: 企业资产查询
+          - menuitem "appstore 资产分组" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]:
+              - img "appstore" [ref=e27]:
+                - img [ref=e28]
+              - text: 资产分组
+          - menuitem "global 任务管理" [ref=e30] [cursor=pointer]:
+            - generic [ref=e31]:
+              - img "global" [ref=e32]:
+                - img [ref=e33]
+              - text: 任务管理
+          - menuitem "search 资产搜索" [ref=e35] [cursor=pointer]:
+            - generic [ref=e36]:
+              - img "search" [ref=e37]:
+                - img [ref=e38]
+              - text: 资产搜索
+          - menuitem "desktop 资产监控" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41]:
+              - img "desktop" [ref=e42]:
+                - img [ref=e43]
+              - text: 资产监控
+          - menuitem "clock-circle 计划任务" [ref=e45] [cursor=pointer]:
+            - generic [ref=e46]:
+              - img "clock-circle" [ref=e47]:
+                - img [ref=e48]
+              - text: 计划任务
+          - menuitem "github GitHub监控" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]:
+              - img "github" [ref=e53]:
+                - img [ref=e54]
+              - text: GitHub监控
+          - menuitem "bug POC管理" [ref=e56] [cursor=pointer]:
+            - generic [ref=e57]:
+              - img "bug" [ref=e58]:
+                - img [ref=e59]
+              - text: POC管理
+          - menuitem "tags 指纹管理" [ref=e62] [cursor=pointer]:
+            - generic [ref=e63]:
+              - img "tags" [ref=e64]:
+                - img [ref=e65]
+              - text: 指纹管理
+          - menuitem "setting 策略配置" [ref=e67] [cursor=pointer]:
+            - generic [ref=e68]:
+              - img "setting" [ref=e69]:
+                - img [ref=e70]
+              - text: 策略配置
+          - menuitem "setting 系统设置" [ref=e72] [cursor=pointer]:
+            - generic [ref=e73]:
+              - img "setting" [ref=e74]:
+                - img [ref=e75]
+              - text: 系统设置
+    - generic [ref=e77]:
+      - generic [ref=e78]:
+        - generic [ref=e79]:
+          - img "menu-fold" [ref=e81] [cursor=pointer]:
+            - img [ref=e82]
+          - generic [ref=e84]: 任务详情
+        - generic [ref=e85]:
+          - generic [ref=e86] [cursor=pointer]:
+            - img "bg-colors" [ref=e87]:
+              - img [ref=e88]
+            - text: 主题色
+          - button "picture 自定义背景" [ref=e92]:
+            - generic [ref=e93] [cursor=pointer]:
+              - img "picture" [ref=e94]:
+                - img [ref=e95]
+              - text: 自定义背景
+          - generic "黑客暗色模式" [ref=e97]:
+            - switch "🌙 ☀️" [checked] [ref=e98] [cursor=pointer]:
+              - generic [ref=e100]:
+                - generic: 🌙
+                - generic: ☀️
+          - generic [ref=e101] [cursor=pointer]:
+            - img "robot" [ref=e102]:
+              - img [ref=e103]
+            - text: AI 助手接入 (MCP)
+          - img "user" [ref=e106]:
+            - img [ref=e107]
+          - generic [ref=e109]: admin
+          - generic [ref=e110] [cursor=pointer]: 修改密码
+          - img "logout" [ref=e112] [cursor=pointer]:
+            - img [ref=e113]
+      - main [ref=e115]:
+        - generic [ref=e390]:
+          - generic [ref=e393]:
+            - button "Back" [ref=e395] [cursor=pointer]:
+              - img "arrow-left" [ref=e396]:
+                - img [ref=e397]
+            - generic [ref=e399]: 全局 相关资产
+          - generic [ref=e400]:
+            - tablist [ref=e401]:
+              - generic [ref=e403]:
+                - tab "站点" [selected] [ref=e405] [cursor=pointer]
+                - tab "子域名" [ref=e407] [cursor=pointer]
+                - tab "IP" [ref=e409] [cursor=pointer]
+                - tab "SSL证书" [ref=e411] [cursor=pointer]
+                - tab "服务" [ref=e413] [cursor=pointer]
+                - tab "文件泄露" [ref=e415] [cursor=pointer]
+                - tab "URL信息" [ref=e417] [cursor=pointer]
+                - tab "风险" [ref=e419] [cursor=pointer]
+                - tab "服务（python）" [ref=e421] [cursor=pointer]
+                - tab "C段" [ref=e423] [cursor=pointer]
+                - tab "nuclei" [ref=e425] [cursor=pointer]
+                - tab "指纹统计" [ref=e427] [cursor=pointer]
+                - tab "JS analysis" [ref=e429] [cursor=pointer]
+                - tab "WIH" [ref=e431] [cursor=pointer]
+            - generic:
+              - generic:
+                - tabpanel "站点"
+          - generic [ref=e432]:
+            - generic [ref=e433]:
+              - generic [ref=e434]: 站点：
+              - generic [ref=e435]:
+                - textbox "请输入站点" [ref=e436]
+                - img "search" [ref=e438] [cursor=pointer]:
+                  - img [ref=e439]
+            - generic [ref=e441]:
+              - generic [ref=e442]: 主机名：
+              - generic [ref=e443]:
+                - textbox "请输入主机名" [ref=e444]
+                - img "search" [ref=e446] [cursor=pointer]:
+                  - img [ref=e447]
+            - generic [ref=e449]:
+              - generic [ref=e450]: 标题：
+              - generic [ref=e451]:
+                - textbox "请输入标题" [ref=e452]
+                - img "search" [ref=e454] [cursor=pointer]:
+                  - img [ref=e455]
+            - generic [ref=e457]:
+              - generic [ref=e458]: Web Server：
+              - generic [ref=e459]:
+                - textbox "请输入Web Server" [ref=e460]
+                - img "search" [ref=e462] [cursor=pointer]:
+                  - img [ref=e463]
+            - generic [ref=e465]:
+              - generic [ref=e466]: 状态码：
+              - generic [ref=e467]:
+                - textbox "请输入状态码" [ref=e468]
+                - img "search" [ref=e470] [cursor=pointer]:
+                  - img [ref=e471]
+            - generic [ref=e473]:
+              - generic [ref=e474]: 标头：
+              - generic [ref=e475]:
+                - textbox "请输入标头" [ref=e476]
+                - img "search" [ref=e478] [cursor=pointer]:
+                  - img [ref=e479]
+            - generic [ref=e481]:
+              - generic [ref=e482]: 指纹：
+              - generic [ref=e483]:
+                - textbox "请输入指纹" [ref=e484]
+                - img "search" [ref=e486] [cursor=pointer]:
+                  - img [ref=e487]
+            - generic [ref=e489]:
+              - generic [ref=e490]: favicon hash：
+              - generic [ref=e491]:
+                - textbox "请输入favicon hash" [ref=e492]
+                - img "search" [ref=e494] [cursor=pointer]:
+                  - img [ref=e495]
+            - generic [ref=e497]:
+              - generic [ref=e498]: 标签：
+              - generic [ref=e499]:
+                - textbox "请输入标签" [ref=e500]
+                - img "search" [ref=e502] [cursor=pointer]:
+                  - img [ref=e503]
+          - generic [ref=e505]:
+            - button "批量删除" [disabled] [ref=e506]:
+              - generic [ref=e507]: 批量删除
+            - button "清 除" [ref=e508] [cursor=pointer]:
+              - generic [ref=e509]: 清 除
+            - button "风险任务下发" [ref=e510] [cursor=pointer]:
+              - generic [ref=e511]: 风险任务下发
+          - table [ref=e518]:
+            - rowgroup [ref=e527]:
+              - row "Select all 序号 站点 标题 headers finger 截图" [ref=e528]:
+                - columnheader "Select all" [ref=e529]:
+                  - checkbox "Select all" [ref=e533] [cursor=pointer]
+                - columnheader "序号" [ref=e535]
+                - columnheader "站点" [ref=e536]
+                - columnheader "标题" [ref=e537]
+                - columnheader "headers" [ref=e538]
+                - columnheader "finger" [ref=e539]
+                - columnheader "截图" [ref=e540]
+            - rowgroup [ref=e541]:
+              - row [ref=e542]:
+                - cell [ref=e543]
+                - cell [ref=e544]
+                - cell [ref=e545]
+                - cell [ref=e546]
+                - cell [ref=e547]
+                - cell [ref=e548]
+                - cell [ref=e549]
+              - 'row "1 https://106.120.66.212 入口 close 添加标签 405 Not Allowed HTTP/1.1 405 Not Allowed Server: nginx Date: Mon, 27 Jul 2026 05:10:25 GMT Content-Type: text/html Content-Length: 576 Connection: keep-alive UpScale Systems Pingdom Uptime Monitoring Fohr +1" [ref=e550]':
+                - cell [ref=e551]:
+                  - checkbox [ref=e554] [cursor=pointer]
+                - cell "1" [ref=e556]
+                - cell "https://106.120.66.212 入口 close 添加标签" [ref=e557]:
+                  - generic [ref=e558]:
+                    - link "https://106.120.66.212" [ref=e559] [cursor=pointer]:
+                      - /url: https://106.120.66.212
+                    - generic [ref=e560]:
+                      - generic [ref=e561]:
+                        - text: 入口
+                        - img "close" [ref=e562] [cursor=pointer]:
+                          - img [ref=e563]
+                      - generic [ref=e565] [cursor=pointer]: 添加标签
+                - cell "405 Not Allowed" [ref=e566]:
+                  - generic [ref=e567]: 405 Not Allowed
+                - 'cell "HTTP/1.1 405 Not Allowed Server: nginx Date: Mon, 27 Jul 2026 05:10:25 GMT Content-Type: text/html Content-Length: 576 Connection: keep-alive" [ref=e568]':
+                  - generic [ref=e570]: "HTTP/1.1 405 Not Allowed Server: nginx Date: Mon, 27 Jul 2026 05:10:25 GMT Content-Type: text/html Content-Length: 576 Connection: keep-alive"
+                - cell "UpScale Systems Pingdom Uptime Monitoring Fohr +1" [ref=e571]:
+                  - generic [ref=e572]:
+                    - generic [ref=e573]: UpScale Systems
+                    - generic [ref=e574]: Pingdom Uptime Monitoring
+                    - generic [ref=e575]: Fohr
+                    - generic [ref=e576] [cursor=pointer]: "+1"
+                - cell [ref=e577]:
+                  - img [ref=e578] [cursor=pointer]
+              - 'row "2 https://43.153.76.24:5001 Favicon Hash: -199460227 入口 close 添加标签 HTTP/1.1 200 OK accept-ranges: bytes etag: W/\"50670-1691132439250\" last-modified: Fri, 04 Aug 2023 07:00:39 GMT content-type: text/html date: Thu, 23 Jul 2026 10:20:21 GMT keep-alive: timeout=20 Content-Length: 50670 Connection: close Vvveb CMS Dailymotion 朗拓健康医院管理系统 +10" [ref=e579]':
+                - cell [ref=e580]:
+                  - checkbox [ref=e583] [cursor=pointer]
+                - cell "2" [ref=e585]
+                - 'cell "https://43.153.76.24:5001 Favicon Hash: -199460227 入口 close 添加标签" [ref=e586]':
+                  - generic [ref=e587]:
+                    - link "https://43.153.76.24:5001" [ref=e588] [cursor=pointer]:
+                      - /url: https://43.153.76.24:5001
+                    - paragraph [ref=e589]: "Favicon Hash: -199460227"
+                    - generic [ref=e590]:
+                      - generic [ref=e591]:
+                        - text: 入口
+                        - img "close" [ref=e592] [cursor=pointer]:
+                          - img [ref=e593]
+                      - generic [ref=e595] [cursor=pointer]: 添加标签
+                - cell [ref=e596]
+                - 'cell "HTTP/1.1 200 OK accept-ranges: bytes etag: W/\"50670-1691132439250\" last-modified: Fri, 04 Aug 2023 07:00:39 GMT content-type: text/html date: Thu, 23 Jul 2026 10:20:21 GMT keep-alive: timeout=20 Content-Length: 50670 Connection: close" [ref=e597]':
+                  - generic [ref=e599]: "HTTP/1.1 200 OK accept-ranges: bytes etag: W/\"50670-1691132439250\" last-modified: Fri, 04 Aug 2023 07:00:39 GMT content-type: text/html date: Thu, 23 Jul 2026 10:20:21 GMT keep-alive: timeout=20 Content-Length: 50670 Connection: close"
+                - cell "Vvveb CMS Dailymotion 朗拓健康医院管理系统 +10" [ref=e600]:
+                  - generic [ref=e601]:
+                    - generic [ref=e602]: Vvveb CMS
+                    - generic [ref=e603]: Dailymotion
+                    - generic [ref=e604]: 朗拓健康医院管理系统
+                    - generic [ref=e605] [cursor=pointer]: "+10"
+                - cell [ref=e606]:
+                  - img [ref=e607] [cursor=pointer]
+              - 'row "3 https://43.153.76.24:81 Favicon Hash: 2132224610 入口 close 添加标签 电子签署平台 HTTP/1.1 200 OK Vary: Origin, Access-Control-Request-Method, Access-Control-Request-Headers X-XSS-Protection: 1; mode=block X-Frame-Options: SAMEORIGIN X-Content-Type-Options: nosniff Content-Security-Policy: script-src * ''unsafe-inline'' ''unsafe-eval''; style-src ''self'' ''unsafe-inline'' dn-staticdown.qbox.me static.geetest.com;img-src ''self'' blob: data: http: *.qiyuesuo.com dn-staticdown.qbox.me static.geetest.com https: *.qiyuesuo.com ;font-src http: https: data:; Content-Type: text/html;charset=utf-8 Content-Language: zh-CN Date: Tue, 22 Jul 2025 07:24:47 GMT Keep-Alive: timeout=60 Content-Length: 1118 Connection: close Vvveb CMS Dailymotion GitLab CI/CD +15" [ref=e608]':
+                - cell [ref=e609]:
+                  - checkbox [ref=e612] [cursor=pointer]
+                - cell "3" [ref=e614]
+                - 'cell "https://43.153.76.24:81 Favicon Hash: 2132224610 入口 close 添加标签" [ref=e615]':
+                  - generic [ref=e616]:
+                    - link "https://43.153.76.24:81" [ref=e617] [cursor=pointer]:
+                      - /url: https://43.153.76.24:81
+                    - paragraph [ref=e618]: "Favicon Hash: 2132224610"
+                    - generic [ref=e619]:
+                      - generic [ref=e620]:
+                        - text: 入口
+                        - img "close" [ref=e621] [cursor=pointer]:
+                          - img [ref=e622]
+                      - generic [ref=e624] [cursor=pointer]: 添加标签
+                - cell "电子签署平台" [ref=e625]:
+                  - generic [ref=e626]: 电子签署平台
+                - 'cell "HTTP/1.1 200 OK Vary: Origin, Access-Control-Request-Method, Access-Control-Request-Headers X-XSS-Protection: 1; mode=block X-Frame-Options: SAMEORIGIN X-Content-Type-Options: nosniff Content-Security-Policy: script-src * ''unsafe-inline'' ''unsafe-eval''; style-src ''self'' ''unsafe-inline'' dn-staticdown.qbox.me static.geetest.com;img-src ''self'' blob: data: http: *.qiyuesuo.com dn-staticdown.qbox.me static.geetest.com https: *.qiyuesuo.com ;font-src http: https: data:; Content-Type: text/html;charset=utf-8 Content-Language: zh-CN Date: Tue, 22 Jul 2025 07:24:47 GMT Keep-Alive: timeout=60 Content-Length: 1118 Connection: close" [ref=e627]':
+                  - generic [ref=e629]: "HTTP/1.1 200 OK Vary: Origin, Access-Control-Request-Method, Access-Control-Request-Headers X-XSS-Protection: 1; mode=block X-Frame-Options: SAMEORIGIN X-Content-Type-Options: nosniff Content-Security-Policy: script-src * 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' dn-staticdown.qbox.me static.geetest.com;img-src 'self' blob: data: http: *.qiyuesuo.com dn-staticdown.qbox.me static.geetest.com https: *.qiyuesuo.com ;font-src http: https: data:; Content-Type: text/html;charset=utf-8 Content-Language: zh-CN Date: Tue, 22 Jul 2025 07:24:47 GMT Keep-Alive: timeout=60 Content-Length: 1118 Connection: close"
+                - cell "Vvveb CMS Dailymotion GitLab CI/CD +15" [ref=e630]:
+                  - generic [ref=e631]:
+                    - generic [ref=e632]: Vvveb CMS
+                    - generic [ref=e633]: Dailymotion
+                    - generic [ref=e634]: GitLab CI/CD
+                    - generic [ref=e635] [cursor=pointer]: "+15"
+                - cell [ref=e636]:
+                  - img [ref=e637] [cursor=pointer]
+              - 'row "4 https://43.153.76.24:800 Favicon Hash: -608918855 入口 close 添加标签 HTTP/1.1 200 OK Date: Thu, 06 Feb 2025 05:48:26 GMT Content-Type: text/html; charset=utf-8 Server: Kestrel Content-Length: 329 Connection: close 天玥运维安全网关 海康威视 流媒体管理服务器 慧林信息安全管理系统 +47" [ref=e638]':
+                - cell [ref=e639]:
+                  - checkbox [ref=e642] [cursor=pointer]
+                - cell "4" [ref=e644]
+                - 'cell "https://43.153.76.24:800 Favicon Hash: -608918855 入口 close 添加标签" [ref=e645]':
+                  - generic [ref=e646]:
+                    - link "https://43.153.76.24:800" [ref=e647] [cursor=pointer]:
+                      - /url: https://43.153.76.24:800
+                    - paragraph [ref=e648]: "Favicon Hash: -608918855"
+                    - generic [ref=e649]:
+                      - generic [ref=e650]:
+                        - text: 入口
+                        - img "close" [ref=e651] [cursor=pointer]:
+                          - img [ref=e652]
+                      - generic [ref=e654] [cursor=pointer]: 添加标签
+                - cell [ref=e655]
+                - 'cell "HTTP/1.1 200 OK Date: Thu, 06 Feb 2025 05:48:26 GMT Content-Type: text/html; charset=utf-8 Server: Kestrel Content-Length: 329 Connection: close" [ref=e656]':
+                  - generic [ref=e658]: "HTTP/1.1 200 OK Date: Thu, 06 Feb 2025 05:48:26 GMT Content-Type: text/html; charset=utf-8 Server: Kestrel Content-Length: 329 Connection: close"
+                - cell "天玥运维安全网关 海康威视 流媒体管理服务器 慧林信息安全管理系统 +47" [ref=e659]:
+                  - generic [ref=e660]:
+                    - generic [ref=e661]: 天玥运维安全网关
+                    - generic [ref=e662]: 海康威视 流媒体管理服务器
+                    - generic [ref=e663]: 慧林信息安全管理系统
+                    - generic [ref=e664] [cursor=pointer]: "+47"
+                - cell [ref=e665]:
+                  - img [ref=e666] [cursor=pointer]
+              - 'row "5 http://43.153.76.24:5000 Favicon Hash: 2132224610 无效 close 添加标签 Weblogic Bridge Message HTTP/1.1 500 OK Date: Wed, 15 Jan 2025 14:08:12 GMT Server: Apache Content-Type: text/html Content-Length: 243 Connection: close Service Provider Pro noVNC 远程访问" [ref=e667]':
+                - cell [ref=e668]:
+                  - checkbox [ref=e671] [cursor=pointer]
+                - cell "5" [ref=e673]
+                - 'cell "http://43.153.76.24:5000 Favicon Hash: 2132224610 无效 close 添加标签" [ref=e674]':
+                  - generic [ref=e675]:
+                    - link "http://43.153.76.24:5000" [ref=e676] [cursor=pointer]:
+                      - /url: http://43.153.76.24:5000
+                    - paragraph [ref=e677]: "Favicon Hash: 2132224610"
+                    - generic [ref=e678]:
+                      - generic [ref=e679]:
+                        - text: 无效
+                        - img "close" [ref=e680] [cursor=pointer]:
+                          - img [ref=e681]
+                      - generic [ref=e683] [cursor=pointer]: 添加标签
+                - cell "Weblogic Bridge Message" [ref=e684]:
+                  - generic [ref=e685]: Weblogic Bridge Message
+                - 'cell "HTTP/1.1 500 OK Date: Wed, 15 Jan 2025 14:08:12 GMT Server: Apache Content-Type: text/html Content-Length: 243 Connection: close" [ref=e686]':
+                  - generic [ref=e688]: "HTTP/1.1 500 OK Date: Wed, 15 Jan 2025 14:08:12 GMT Server: Apache Content-Type: text/html Content-Length: 243 Connection: close"
+                - cell "Service Provider Pro noVNC 远程访问" [ref=e689]:
+                  - generic [ref=e690]:
+                    - generic [ref=e691]: Service Provider Pro
+                    - generic [ref=e692]: noVNC 远程访问
+                - cell [ref=e693]:
+                  - img [ref=e694] [cursor=pointer]
+          - generic [ref=e695]:
+            - generic [ref=e696]: 共 1 页 / 5 条数据
+            - list [ref=e697]:
+              - listitem "Previous Page" [ref=e698]:
+                - button "left" [disabled] [ref=e699]:
+                  - img "left" [ref=e700]:
+                    - img [ref=e701]
+              - listitem "1" [ref=e703] [cursor=pointer]:
+                - generic [ref=e704]: "1"
+              - listitem "Next Page" [ref=e705]:
+                - button "right" [disabled] [ref=e706]:
+                  - img "right" [ref=e707]:
+                    - img [ref=e708]
+              - listitem [ref=e710]:
+                - generic [ref=e711] [cursor=pointer]:
+                  - generic [ref=e712]:
+                    - combobox [ref=e714]
+                    - generic [ref=e715]: 10 / page
+                  - generic:
+                    - img:
+                      - img
+        - generic [ref=e389]: Powered by ARL-Next
+  - generic:
+    - generic:
+      - generic: 13:27
+      - generic:
+        - img "deployment-unit":
+          - img
+        - generic: ARL-Next OS
+      - generic: Monitoring assets... Click anywhere to resume.

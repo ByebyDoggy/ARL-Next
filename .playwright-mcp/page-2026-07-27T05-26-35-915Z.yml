@@ -1,0 +1,295 @@
+- generic [ref=e4]:
+  - generic [ref=e6]:
+    - complementary [ref=e7]:
+      - generic [ref=e8]:
+        - generic "点击隐藏/显示界面" [ref=e9] [cursor=pointer]:
+          - img "deployment-unit" [ref=e10]:
+            - img [ref=e11]
+          - generic [ref=e13]: ARL-Next
+        - menu [ref=e14]:
+          - menuitem "dashboard 仪表盘" [ref=e15] [cursor=pointer]:
+            - generic [ref=e16]:
+              - img "dashboard" [ref=e17]:
+                - img [ref=e18]
+              - text: 仪表盘
+          - menuitem "search 企业资产查询" [ref=e20] [cursor=pointer]:
+            - generic [ref=e21]:
+              - img "search" [ref=e22]:
+                - img [ref=e23]
+              - text: 企业资产查询
+          - menuitem "appstore 资产分组" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]:
+              - img "appstore" [ref=e27]:
+                - img [ref=e28]
+              - text: 资产分组
+          - menuitem "global 任务管理" [ref=e30] [cursor=pointer]:
+            - generic [ref=e31]:
+              - img "global" [ref=e32]:
+                - img [ref=e33]
+              - text: 任务管理
+          - menuitem "search 资产搜索" [ref=e35] [cursor=pointer]:
+            - generic [ref=e36]:
+              - img "search" [ref=e37]:
+                - img [ref=e38]
+              - text: 资产搜索
+          - menuitem "desktop 资产监控" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41]:
+              - img "desktop" [ref=e42]:
+                - img [ref=e43]
+              - text: 资产监控
+          - menuitem "clock-circle 计划任务" [ref=e45] [cursor=pointer]:
+            - generic [ref=e46]:
+              - img "clock-circle" [ref=e47]:
+                - img [ref=e48]
+              - text: 计划任务
+          - menuitem "github GitHub监控" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]:
+              - img "github" [ref=e53]:
+                - img [ref=e54]
+              - text: GitHub监控
+          - menuitem "bug POC管理" [ref=e56] [cursor=pointer]:
+            - generic [ref=e57]:
+              - img "bug" [ref=e58]:
+                - img [ref=e59]
+              - text: POC管理
+          - menuitem "tags 指纹管理" [ref=e62] [cursor=pointer]:
+            - generic [ref=e63]:
+              - img "tags" [ref=e64]:
+                - img [ref=e65]
+              - text: 指纹管理
+          - menuitem "setting 策略配置" [ref=e67] [cursor=pointer]:
+            - generic [ref=e68]:
+              - img "setting" [ref=e69]:
+                - img [ref=e70]
+              - text: 策略配置
+          - menuitem "setting 系统设置" [ref=e72] [cursor=pointer]:
+            - generic [ref=e73]:
+              - img "setting" [ref=e74]:
+                - img [ref=e75]
+              - text: 系统设置
+    - generic [ref=e77]:
+      - generic [ref=e78]:
+        - generic [ref=e79]:
+          - img "menu-fold" [ref=e81] [cursor=pointer]:
+            - img [ref=e82]
+          - generic [ref=e84]: 任务管理
+        - generic [ref=e85]:
+          - generic [ref=e86] [cursor=pointer]:
+            - img "bg-colors" [ref=e87]:
+              - img [ref=e88]
+            - text: 主题色
+          - button "picture 自定义背景" [ref=e92]:
+            - generic [ref=e93] [cursor=pointer]:
+              - img "picture" [ref=e94]:
+                - img [ref=e95]
+              - text: 自定义背景
+          - generic "黑客暗色模式" [ref=e97]:
+            - switch "🌙 ☀️" [checked] [ref=e98] [cursor=pointer]:
+              - generic [ref=e100]:
+                - generic: 🌙
+                - generic: ☀️
+          - generic [ref=e101] [cursor=pointer]:
+            - img "robot" [ref=e102]:
+              - img [ref=e103]
+            - text: AI 助手接入 (MCP)
+          - img "user" [ref=e106]:
+            - img [ref=e107]
+          - generic [ref=e109]: admin
+          - generic [ref=e110] [cursor=pointer]: 修改密码
+          - img "logout" [ref=e112] [cursor=pointer]:
+            - img [ref=e113]
+      - main [ref=e115]:
+        - generic [ref=e117]:
+          - generic [ref=e118]:
+            - button "添加任务" [ref=e119] [cursor=pointer]:
+              - generic [ref=e120]: 添加任务
+            - button "FOFA 任务下发" [ref=e121] [cursor=pointer]:
+              - generic [ref=e122]: FOFA 任务下发
+            - button "全局查看" [ref=e123] [cursor=pointer]:
+              - generic [ref=e124]: 全局查看
+          - generic [ref=e126]:
+            - generic [ref=e128]:
+              - generic "任务名:" [ref=e130]: "任务名 :"
+              - generic [ref=e134]:
+                - textbox "请输入任务名进行搜索" [ref=e135]
+                - img "search" [ref=e137] [cursor=pointer]:
+                  - img [ref=e138]
+            - generic [ref=e141]:
+              - generic "目标:" [ref=e143]: "目标 :"
+              - generic [ref=e147]:
+                - textbox "请输入目标进行搜索" [ref=e148]
+                - img "search" [ref=e150] [cursor=pointer]:
+                  - img [ref=e151]
+            - generic [ref=e154]:
+              - generic "Task_Id:" [ref=e156]: "Task_Id :"
+              - generic [ref=e160]:
+                - textbox "请输入Task_Id进行搜索" [ref=e161]
+                - img "search" [ref=e163] [cursor=pointer]:
+                  - img [ref=e164]
+            - generic [ref=e167]:
+              - generic "任务类型:" [ref=e169]: "任务类型 :"
+              - generic [ref=e173] [cursor=pointer]:
+                - generic [ref=e174]:
+                  - combobox [ref=e176]
+                  - generic: 请选择任务类型进行搜索
+                - generic:
+                  - img:
+                    - img
+            - generic [ref=e178]:
+              - generic "状态:" [ref=e180]: "状态 :"
+              - generic [ref=e184]:
+                - textbox "请输入状态进行搜索" [ref=e185]
+                - img "search" [ref=e187] [cursor=pointer]:
+                  - img [ref=e188]
+            - generic [ref=e191]:
+              - generic "站点数量:" [ref=e193]: "站点数量 :"
+              - generic [ref=e197]:
+                - generic [ref=e198]:
+                  - textbox "请输入数量" [ref=e199]
+                  - img "search" [ref=e201] [cursor=pointer]:
+                    - img [ref=e202]
+                - generic [ref=e204] [cursor=pointer]:
+                  - generic [ref=e205]:
+                    - combobox [ref=e207]
+                    - generic [ref=e208]: 等于
+                  - generic:
+                    - img:
+                      - img
+            - generic [ref=e210]:
+              - generic "域名数量:" [ref=e212]: "域名数量 :"
+              - generic [ref=e216]:
+                - generic [ref=e217]:
+                  - textbox "请输入数量" [ref=e218]
+                  - img "search" [ref=e220] [cursor=pointer]:
+                    - img [ref=e221]
+                - generic [ref=e223] [cursor=pointer]:
+                  - generic [ref=e224]:
+                    - combobox [ref=e226]
+                    - generic [ref=e227]: 等于
+                  - generic:
+                    - img:
+                      - img
+            - generic [ref=e229]:
+              - generic "WIH数量:" [ref=e231]: "WIH数量 :"
+              - generic [ref=e235]:
+                - generic [ref=e236]:
+                  - textbox "请输入数量" [ref=e237]
+                  - img "search" [ref=e239] [cursor=pointer]:
+                    - img [ref=e240]
+                - generic [ref=e242] [cursor=pointer]:
+                  - generic [ref=e243]:
+                    - combobox [ref=e245]
+                    - generic [ref=e246]: 等于
+                  - generic:
+                    - img:
+                      - img
+          - generic [ref=e247]:
+            - button "批量删除" [disabled] [ref=e248]:
+              - generic [ref=e249]: 批量删除
+            - button "批量停止" [disabled] [ref=e250]:
+              - generic [ref=e251]: 批量停止
+            - button "批量导出 down" [disabled] [ref=e252]:
+              - generic [ref=e253]: 批量导出
+              - img "down" [ref=e254]:
+                - img [ref=e255]
+          - table [ref=e263]:
+            - rowgroup [ref=e275]:
+              - row "Select all 任务名 caret-up caret-down 目标 caret-up caret-down 统计 配置项 状态 开始时间 结束时间 Task_Id 操作" [ref=e276]:
+                - columnheader "Select all" [ref=e277]:
+                  - checkbox "Select all" [ref=e281] [cursor=pointer]
+                - columnheader "任务名 caret-up caret-down" [ref=e283] [cursor=pointer]:
+                  - generic [ref=e284]:
+                    - generic [ref=e285]: 任务名
+                    - generic [ref=e287]:
+                      - generic "caret-up" [ref=e288]:
+                        - img [ref=e289]
+                      - generic "caret-down" [ref=e291]:
+                        - img [ref=e292]
+                - columnheader "目标 caret-up caret-down" [ref=e294] [cursor=pointer]:
+                  - generic [ref=e295]:
+                    - generic [ref=e296]: 目标
+                    - generic [ref=e298]:
+                      - generic "caret-up" [ref=e299]:
+                        - img [ref=e300]
+                      - generic "caret-down" [ref=e302]:
+                        - img [ref=e303]
+                - columnheader "统计" [ref=e305]
+                - columnheader "配置项" [ref=e306]
+                - columnheader "状态" [ref=e307]
+                - columnheader "开始时间" [ref=e308]
+                - columnheader "结束时间" [ref=e309]
+                - columnheader "Task_Id" [ref=e310]
+                - columnheader "操作" [ref=e311]
+            - rowgroup [ref=e312]:
+              - row [ref=e313]:
+                - cell [ref=e314]
+                - cell [ref=e315]
+                - cell [ref=e316]
+                - cell [ref=e317]
+                - cell [ref=e318]
+                - cell [ref=e319]
+                - cell [ref=e320]
+                - cell [ref=e321]
+                - cell [ref=e322]
+                - cell [ref=e323]
+              - row "asmc.net.cn Fofa ip 17 5 3 端口扫描 done 2026-07-27 13:10:09 2026-07-27 13:10:53 6a66e8300fc701f8c1c352da 同 步 导 出 停 止 删 除 重 启" [ref=e324]:
+                - cell [ref=e325]:
+                  - checkbox [ref=e328] [cursor=pointer]
+                - cell "asmc.net.cn" [ref=e330]
+                - cell "Fofa ip 17" [ref=e331]:
+                  - generic [ref=e332]: Fofa ip 17
+                - cell "5 3" [ref=e333]:
+                  - generic [ref=e334]:
+                    - superscript [ref=e336]:
+                      - paragraph [ref=e338]: "5"
+                    - superscript [ref=e340]:
+                      - paragraph [ref=e342]: "3"
+                - cell "端口扫描" [ref=e343]:
+                  - generic [ref=e344] [cursor=pointer]: 端口扫描
+                - cell "done" [ref=e345]:
+                  - generic [ref=e347] [cursor=pointer]: done
+                - cell "2026-07-27 13:10:09" [ref=e348]
+                - cell "2026-07-27 13:10:53" [ref=e349]
+                - cell "6a66e8300fc701f8c1c352da" [ref=e350]
+                - cell "同 步 导 出 停 止 删 除 重 启" [ref=e351]:
+                  - generic [ref=e352]:
+                    - button "同 步" [ref=e354] [cursor=pointer]:
+                      - generic [ref=e355]: 同 步
+                    - button "导 出" [ref=e357] [cursor=pointer]:
+                      - generic [ref=e358]: 导 出
+                    - button "停 止" [disabled] [ref=e360]:
+                      - generic [ref=e361]: 停 止
+                    - button "删 除" [ref=e363] [cursor=pointer]:
+                      - generic [ref=e364]: 删 除
+                    - button "重 启" [ref=e366] [cursor=pointer]:
+                      - generic [ref=e367]: 重 启
+          - generic [ref=e368]:
+            - generic [ref=e369]: 共 1 页 / 1 条数据
+            - list [ref=e370]:
+              - listitem "Previous Page" [ref=e371]:
+                - button "left" [disabled] [ref=e372]:
+                  - img "left" [ref=e373]:
+                    - img [ref=e374]
+              - listitem "1" [ref=e376] [cursor=pointer]:
+                - generic [ref=e377]: "1"
+              - listitem "Next Page" [ref=e378]:
+                - button "right" [disabled] [ref=e379]:
+                  - img "right" [ref=e380]:
+                    - img [ref=e381]
+              - listitem [ref=e383]:
+                - generic [ref=e384] [cursor=pointer]:
+                  - generic [ref=e385]:
+                    - combobox [ref=e387]
+                    - generic [ref=e388]: 10 / page
+                  - generic:
+                    - img:
+                      - img
+        - generic [ref=e389]: Powered by ARL-Next
+  - generic:
+    - generic:
+      - generic: 13:26
+      - generic:
+        - img "deployment-unit":
+          - img
+        - generic: ARL-Next OS
+      - generic: Monitoring assets... Click anywhere to resume.

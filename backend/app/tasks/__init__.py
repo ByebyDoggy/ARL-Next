@@ -1,4 +1,4 @@
-from .domain import domain_task
+from .domain import domain_task, resume_task
 from .ip import ip_task
 from .scheduler import domain_executors, ip_executor
 from .poc import run_risk_cruising_task

@@ -10,6 +10,7 @@ from app import modules
 from app.modules import ScanPortType, get_scan_ports, DomainDictType, CollectSource, TaskStatus
 from app.services import fetchCert, run_risk_cruising, run_sniffer, BaseUpdateTask
 from app.services.commonTask import CommonTask, WebSiteFetch, build_url_item
+from bson import ObjectId
 from app.helpers.domain import find_private_domain_by_task_id, find_public_ip_by_task_id
 from app.services.findVhost import find_vhost
 from app.services.dns_query import run_query_plugin
@@ -461,6 +462,15 @@ class DomainTask(CommonTask):
 
         self.wih_domain_set = set()  # 通过调用 WebInfoHunter 获取的域名集合
 
+        # Checkpoint/Resume 支持
+        self.completed_steps = set()
+        self.checkpoint_data = task_data.get("checkpoint", {}) if (
+            task_data := utils.conn_db("task").find_one({"_id": ObjectId(task_id)})
+            if task_id else {}) else {}
+        if self.checkpoint_data:
+            self.completed_steps = set(self.checkpoint_data.get("completed_steps", []))
+            self.base_domain = self.checkpoint_data.get("round_seeds", self.base_domain)
+
         scan_port_map = {
             "test": ScanPortType.TEST,
             "top100": ScanPortType.TOP100,
@@ -850,6 +860,32 @@ class DomainTask(CommonTask):
             logger.info("extract_san_domains: added {} new domains from cert SAN (total SAN: {})".format(
                 len(domain_info_list), len(san_domains)))
 
+    # ---------- Checkpoint/Resume 支持 ----------
+    def _save_checkpoint(self, step_name):
+        """保存步骤 checkpoint 到 task 文档"""
+        self.completed_steps.add(step_name)
+        cp = {
+            "completed_steps": sorted(list(self.completed_steps)),
+            "current_round": getattr(self, "_current_round", 1),
+            "round_seeds": self.base_domain,
+            "original_target": getattr(self, "_original_target", self.base_domain),
+        }
+        utils.conn_db("task").update_one(
+            {"_id": ObjectId(self.task_id)},
+            {"$set": {"checkpoint": cp}}
+        )
+
+    def _step(self, step_name, skip_if_exists=True):
+        """上下文管理器：步骤执行前检查 checkpoint，执行后保存"""
+        if skip_if_exists and step_name in self.completed_steps:
+            logger.info("checkpoint: skipping {} (already done)".format(step_name))
+            return False
+        return step_name
+
+    def _is_done(self, step_name):
+        """检查步骤是否已完成"""
+        return step_name in self.completed_steps
+
     # *** 执行域名查询插件
     def dns_query_plugin(self):
         logger.info("start run dns_query_plugin {}".format(self.base_domain))
@@ -1118,27 +1154,54 @@ class DomainTask(CommonTask):
             domain_site_update(self.task_id, list(self.wih_domain_set), "wih")
 
     def run(self):
-        """执行域名资产发现，支持循环收敛（默认 1 轮=线性扫描）"""
+        """执行域名资产发现，支持循环收敛和 Checkpoint/Resume"""
         self.update_task_field("start_time", utils.curr_date())
+        self._original_target = self.base_domain
 
         options = getattr(self, 'options', {})
         cc = ConvergenceController(self.task_id, options)
 
-        for round_num in range(1, cc.max_rounds + 1):
+        start_round = self.checkpoint_data.get("current_round", 1)
+        for round_num in range(start_round, cc.max_rounds + 1):
+            self._current_round = round_num
             logger.info("=== DomainTask round {}/{} {}, targets in scope ===".format(
                 round_num, cc.max_rounds,
                 "convergence ON" if cc.enabled else "linear mode"))
 
-            self.domain_fetch()
-            self.search_engines()
-            self.start_ip_fetch()
-            self.start_site_fetch()
-            self.start_find_vhost()
-            self.start_poc_run()
-            self.start_wih_domain_update()
+            # 每轮步骤，每个步骤检查 checkpoint 跳过
+            cp_prefix = "round{}_".format(round_num)
 
-            # JS 深度分析（新增步骤）
-            if options.get("js_analysis", False) or options.get("web_info_hunter", True):
+            if self._step(cp_prefix + "domain_fetch"):
+                self.domain_fetch()
+                self._save_checkpoint(cp_prefix + "domain_fetch")
+
+            if self._step(cp_prefix + "search_engines"):
+                self.search_engines()
+                self._save_checkpoint(cp_prefix + "search_engines")
+
+            if self._step(cp_prefix + "ip_fetch"):
+                self.start_ip_fetch()
+                self._save_checkpoint(cp_prefix + "ip_fetch")
+
+            if self._step(cp_prefix + "site_fetch"):
+                self.start_site_fetch()
+                self._save_checkpoint(cp_prefix + "site_fetch")
+
+            if self._step(cp_prefix + "find_vhost"):
+                self.start_find_vhost()
+                self._save_checkpoint(cp_prefix + "find_vhost")
+
+            if self._step(cp_prefix + "poc_run"):
+                self.start_poc_run()
+                self._save_checkpoint(cp_prefix + "poc_run")
+
+            if self._step(cp_prefix + "wih_update"):
+                self.start_wih_domain_update()
+                self._save_checkpoint(cp_prefix + "wih_update")
+
+            # JS 深度分析
+            js_step = cp_prefix + "js_analysis"
+            if self._step(js_step) and (options.get("js_analysis", False) or options.get("web_info_hunter", True)):
                 try:
                     sites = [s["site"] for s in utils.conn_db("site").find(
                         {"task_id": self.task_id}, {"site": 1})]
@@ -1147,6 +1210,7 @@ class DomainTask(CommonTask):
                         run_js_analysis(sites[:Config.JS_ANALYSIS_MAX_PER_SITE], self.task_id)
                 except Exception as e:
                     logger.exception("JS analysis error: {}".format(e))
+                self._save_checkpoint(js_step)
 
             # 收敛判定（整轮完成后）
             if round_num < cc.max_rounds and cc.enabled:
@@ -1155,19 +1219,18 @@ class DomainTask(CommonTask):
                 converged, reason = cc.should_converge(round_num, new_seeds)
                 cc.log_round(round_num, new_seeds, converged, reason)
                 self.update_task_field("round_info", cc.rounds_log)
+                self._save_checkpoint(cp_prefix + "_converged")
                 logger.info("Round {} converge: {}. {}".format(
                     round_num, "YES" if converged else "NO", reason))
                 if converged:
                     break
-                # 未收敛：将新种子加入下一轮目标
                 new_targets = ",\n".join(sorted(new_seeds)[:100])
                 if new_targets:
                     logger.info("New seeds for round {}: {}".format(round_num + 1, new_targets))
                     self.base_domain = new_targets
             else:
-                break  # 不启用收敛或最后一轮，直接结束
+                break
 
-        # 统计和同步
         self.common_run()
         self.update_task_field("status", TaskStatus.DONE)
         self.update_task_field("end_time", utils.curr_date())
@@ -1181,3 +1244,49 @@ def domain_task(base_domain, task_id, options):
         logger.exception(e)
         d.update_task_field("status", TaskStatus.ERROR)
         d.update_task_field("end_time", utils.curr_date())
+
+
+def resume_task(task_id):
+    """续跑已停止的任务"""
+    from app import celerytask
+    from app.modules import CeleryAction, CeleryRoutingKey
+
+    task_data = utils.conn_db('task').find_one({"_id": ObjectId(task_id)})
+    if not task_data:
+        logger.error("resume_task: task {} not found".format(task_id))
+        return
+
+    if task_data["status"] not in ("stop", "error"):
+        logger.warning("resume_task: task {} status is {}, not resumable".format(
+            task_id, task_data["status"]))
+        return
+
+    checkpoint = task_data.get("checkpoint")
+    if not checkpoint:
+        logger.warning("resume_task: task {} has no checkpoint data".format(task_id))
+        return
+
+    # 重置状态为 resumed，清除 end_time，重新派发 DOMAIN_TASK（DomainTask 构造时自动读取 checkpoint）
+    utils.conn_db('task').update_one(
+        {"_id": ObjectId(task_id)},
+        {"$set": {"status": TaskStatus.RESUMED, "start_time": utils.curr_date()},
+         "$unset": {"end_time": ""}}
+    )
+
+    task_options = {
+        "celery_action": CeleryAction.DOMAIN_TASK,
+        "data": task_data.get("options", {})
+    }
+    task_options["data"]["task_id"] = task_id
+    task_options["data"]["name"] = task_data.get("name", "")
+    task_options["data"]["target"] = checkpoint.get("original_target", task_data.get("target", ""))
+
+    celery_id = celerytask.arl_task.apply_async(
+        kwargs={'options': task_options},
+        queue=CeleryRoutingKey.ASSET_TASK)
+
+    utils.conn_db('task').update_one(
+        {"_id": ObjectId(task_id)},
+        {"$set": {"celery_id": str(celery_id)}})
+
+    logger.info("resume_task: task {} resumed, celery_id: {}".format(task_id, celery_id))

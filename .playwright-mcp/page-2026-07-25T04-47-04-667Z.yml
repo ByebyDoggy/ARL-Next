@@ -1,0 +1,572 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e6]:
+    - heading "怎么做好资产信息收集" [level=1] [ref=e7]
+    - generic [ref=e8]:
+      - button "进击安全" [ref=e10] [cursor=pointer]
+      - generic:
+        - emphasis [ref=e11]: 2026年7月25日 11:12
+        - emphasis [ref=e12]: 北京
+    - generic [ref=e14]:
+      - paragraph [ref=e15]: 编者荐语：
+      - paragraph [ref=e16]: 谢谢k哥的指导
+    - generic [ref=e17]:
+      - option "以下文章来源于Yfansec ，作者kk" [ref=e18]
+      - link "Yfansec . 安全项目合作+MiManchimo127x" [ref=e19]:
+        - /url: "#"
+        - option "Yfansec . 安全项目合作+MiManchimo127x" [ref=e22]:
+          - strong [ref=e23]: Yfansec
+          - generic [ref=e24]: .
+          - paragraph [ref=e25]: 安全项目合作+MiManchimo127x
+    - generic [ref=e26]:
+      - heading "资产发现不是枚举是展开" [level=1] [ref=e27]
+      - paragraph [ref=e28]: 经常挖 SRC 的师傅都知道，资产分核心和边缘，边缘赏金低。但量是基础，没量连碰核心的机会都没有。当然很多众测项目也不分边缘核心资产，这时候拼的就是信息收集能力了，尤其现在大家都用 AI 扫洞，工具这层拉不开差距，差距在你手里有多少系统——多一个别人没发现的，就多一分挖到别人挖不到的几率。攻防演练不分核心边缘，拿到权限和数据就算分。那些 SRC 里不值钱的边缘资产——老系统、测试环境、调试接口——全成了突破口，它们没人盯，但和生产同网段同权限，从这儿横向进去经常能摸到核心。
+      - paragraph [ref=e29]: 甲方怕的是自己不知道自己有什么。安全团队压根不知道的资产，往往是攻破的入口。攻击者找到一个你不知道的资产，前面所有防护就全绕过了。
+      - separator [ref=e30]
+      - paragraph [ref=e31]:
+        - text: 资产信息收集这件事，子域名、端口、目录爆破三件套大家都会，本文不再赘述。这里想讲的是三件套之后的部分——扫出来的 IP、域名、端口只是
+        - strong [ref=e32]: 种子
+        - text: ，真正值钱的暴露面，在每个种子背后展开的一整张网里：子系统、微服务、二开的中间件、反代后面的真实后端、废弃还活着的老系统、测试环境延伸到生产、供应链横向打通。
+      - paragraph [ref=e33]:
+        - text: 这篇要讲的，就是
+        - strong [ref=e34]: 怎么把扫出来的种子展开成一张攻击面网络，怎么在噪声里把真相连出来
+        - text: 。三件套人人会用，重点在三件套之后。
+      - separator [ref=e35]
+      - paragraph [ref=e36]: 一直想把自己的收集思路结合编排串联起来写一款平台，用来减少工作量和提高效率，扩大攻击面。之前一直想写但是自己代码水平太差，很多思路都无法落地，但是现在用 AI 慢慢地可以落地了，这一个多月也是反复重构修 bug，总是感觉差点意思。在调试过程中帮朋友收集了些资产也是有不少出货，大部分代码都是用 GPT 完成的，但是有一说一 GPT 写的前端确实丑。
+      - paragraph [ref=e37]: 大家也可以关注一下他的公众号，平常分享比较多的还是白盒类的案例，也是最近开始黑盒漏洞挖掘。
+      - link "进击安全 ， 主要分享一些个人实战经验，以及漏洞复现，代码审计，等等方面的文章，欢迎大家关注我的公众号呀，可以投稿哦，有稿费的哦，菜鸟路过～～～ 122篇原创内容 公众号" [ref=e41]:
+        - option [ref=e42]:
+          - generic [ref=e47]:
+            - strong [ref=e49]: 进击安全
+            - generic [ref=e51]: 主要分享一些个人实战经验，以及漏洞复现，代码审计，等等方面的文章，欢迎大家关注我的公众号呀，可以投稿哦，有稿费的哦，菜鸟路过～～～
+            - generic [ref=e52]: 122篇原创内容
+          - generic [ref=e55]: 公众号
+      - paragraph [ref=e56]: 甲方朋友暴露面梳理：
+      - img "图片" [ref=e58]
+      - paragraph [ref=e59]:
+        - text: 现在 AI 对单个系统的信息收集能力已经很强了，给它一个站点，让它读 JS、推理架构、挖接口、分析响应，它做得比大多数人快、也比大多数人全。但 AI 的强，是强在"给定一个目标之后怎么深挖"。真正卡住大多数人的，是
+        - strong [ref=e60]: 怎么有足够多的目标喂给它
+        - text: 。
+      - paragraph [ref=e61]:
+        - text: 这正是平台要解决的问题。平台的意义不在单个系统挖得多深，而在
+        - strong [ref=e62]: 种子和入口的拓展
+        - text: ——把一个域名展开成几十个子系统，把一个证书的 SAN 拉出一串内部资产，把一个 favicon hash 横向打通一整片同源系统，把测试环境和生产关联起来。AI 是放大镜，但你得先有足够多的东西让它放大。平台干的活，就是把种子铺开、把入口找全，让 AI 有足够多的目标可以深挖。
+      - paragraph [ref=e63]: 思路是人的，执行是 AI 的，平台是把两者串起来的那根线。
+      - paragraph [ref=e64]: 有甲方师傅需要信息收集的话可以公众号私信我，试试对比效果，我也能发现哪些不足和改进平台。那种超大型 src 就别发我了，服务器配置不够容易跑冒烟....
+      - separator [ref=e65]
+      - heading "一、种子不是资产" [level=2] [ref=e66]
+      - paragraph [ref=e67]:
+        - text: 扫到一个
+        - code [ref=e68]: api.target.com
+        - text: ，常规做法是记下来打 80/443 收工。这是把资产当一个孤立的点。但这名字背后其实压着一整层架构：最前面是一个网关（Nginx / Kong / APISIX 或自研），网关后面是按路径或子域名拆分的一堆微服务，每个微服务又有自己的管理端点（actuator、pprof、metrics、swagger），以及它们依赖的中间件（注册中心 Nacos/Eureka/Consul、配置中心 Apollo/Nacos、各种 MQ 管控台、数据库管控台）。再往下，还有二开过的中间件（改过源码的 Tomcat、定制过的 Nginx 模块、自包的网关），以及这个域名共享代码、共享鉴权、共享数据库的其他环境（测试、预发、灰度），还有前端框架、组件库、各种 SDK 各自的供应链。
+      - paragraph [ref=e69]:
+        - text: 一个种子能扯出一张网。做资产发现是在做这张网的拓扑发现，不是点的枚举。后面所有的方法，都是围绕一个问题展开的：
+        - strong [ref=e70]: 这个种子背后，还连着什么我不知道的东西？
+      - separator [ref=e71]
+      - heading "二、先降噪，再用数据" [level=2] [ref=e72]
+      - paragraph [ref=e73]: 数据源越多，噪声越多。不做降噪，你会在 5000 条"资产"里耗上一整个星期，最后真正在暴露的可能就 50 条。降噪的核心，是从响应里判断这个资产到底是不是真在跑、跑的是什么、跑得活不活，而不是单纯看端口通不通、域名解不解析。
+      - paragraph [ref=e74]:
+        - text: 先说 404。扫到 404 默认就扔掉，是最大的浪费。404 长得不一样，信息量差很多，关键是要识别
+        - strong [ref=e75]: 是谁返回的 404
+        - text: 。Web 服务器的原生 404（Nginx 默认页、Tomcat 默认页），说明后面是个裸的、没配好路由的中间件，这本身就是暴露面，默认口令、管理端点、解析漏洞都能接着打。应用框架的 404（Spring 的 Whitelabel、Django 的 debug 404、Next.js 的 404），说明应用活着只是路径不存在，框架信息直接白送，而且经常带堆栈、带路径、带环境变量。网关的 404（Kong 的 message、APISIX 那个 JSON
+        - code [ref=e76]: "{\"error_msg\":\"404 Route Not Found\"}"
+        - text: ），说明这是个网关，路由表里没这个 path，但网关本身的管理面、其他路由、后端 service 列表全是目标。CDN/WAF 的 404（云厂商定制页），说明这域名挂 CDN 后面，真实源站还没找到。还有最骗人的软 404，状态码 200 内容却是"页面不存在"，必须靠内容 hash 判断。Nginx 裸 404 你去打中间件，Spring Whitelabel 你去挖应用，处置方式完全不一样，统一当死链处理会漏掉大量信号。
+      - paragraph [ref=e77]: 再说"活着"这个判断。端口通不通和应用活没活是两码事，"存活"不是一个布尔值，是个程度问题。端口开了但应用没起（TCP 握手成功、HTTP 无响应或连接重置），说明中间件在但应用挂了或没部署，这批反而最值得打，直接打中间件层。应用起了但业务空（首页能开、所有接口 401/403/500），说明鉴权挡着或后端依赖挂了，而鉴权挡着不等于不能打，绕鉴权和找未授权端点恰恰是高价值方向。只有用"应用能不能正常响应业务"来分级，才能把精力分配对。端口通但应用没起的那批，经常是中间件默认口令和未授权访问的重灾区。
+      - paragraph [ref=e78]: 最后是去重。几千条资产里大量是同一套应用的不同入口，按 IP 或域名去重没意义，必须按指纹：favicon hash（SaaS 和内部系统爱用默认 favicon，hash 一致就是同一套）、页面标题和 meta、特定静态资源路径、HTTP 响应头组合、报错页特征。指纹一致的聚成一类，一类只深挖一个代表，其余标记同源。几千条资产经常能压缩到几十个真实系统，工作量直接降一个数量级。
+      - separator [ref=e79]
+      - heading "三、403/404 该不该扫" [level=2] [ref=e80]
+      - paragraph [ref=e81]: 这一节想讲清楚一个问题：遇到 403/404，什么时候该继续扫，什么时候扫了纯属浪费时间。
+      - paragraph [ref=e82]:
+        - text: 扫描这件事，本质上是一个信息探测过程——发不同的输入（路径），看输出（响应）有没有差异。响应有差异等于路径有区分度，扫描才有效。如果某一层把所有输入都抹平成同一个输出，那扫描就是无效探测，发 10000 个路径和发 0 个路径，获得的信息一样多。所以判断要不要扫，先得判断一件事：
+        - strong [ref=e83]: 这个入口的 403/404，是内容层返回的，还是拦截层返回的。
+      - paragraph [ref=e84]: 403 要看是谁挡的。如果是 WAF 或统一访问控制层返回的，所有路径一律 403、响应字节级一致，这种情况下路径扫描纯浪费，因为你扫什么都是 403，响应没有区分度；该做的是换 IP、降速率、分块绕 WAF，或者干脆放弃这个入口走旁路（其他子域名、其他端口、客户端直连、历史 IP）。如果是应用鉴权返回的 403（已认证但权限不足，或没登录访问需登录资源），路径是真实存在的，扫描能发现路径，但发现了一样是 403，这时扫路径意义不大，该转向找未授权可访问的同源接口、找鉴权绕过（方法切换 PUT/DELETE/PATCH、大小写、末尾加点加斜杠）、找这个资源的其他访问方式。如果是反代或路由层返回的 403，说明路由规则明确禁止，扫描无效，该去找网关管理面拿全量路由、改 Host/SNI 试虚拟主机。
+      - paragraph [ref=e85]: 404 同理分几种。全局统一 404（所有不存在路径返回字节级完全相同的 404 页）是扫描的理想情况，响应有任何差异就等于路径存在，可以放心扫。软 404 必须用响应长度、内容指纹、hash 聚类来判断，不能只看状态码。网关 404 是路由不存在，对这域名扫路径意义不大，但网关本身是目标，该扫的是网关管理面和其他路由对应的域名。
+      - paragraph [ref=e86]:
+        - text: 实战里有一个必做的扫描前动作：
+        - strong [ref=e87]: 先发 5 到 10 个明显不存在的随机路径
+        - text: （比如
+        - code [ref=e88]: /asdfqwertasdf12345
+        - text: ），看响应是否完全一致。全部字节级一致，说明拦截层在内容层之前，扫描的响应差异可信，可以扫；不一致，说明存在软 404 或动态处理，扫描结果必须用内容指纹二次过滤；全部 403 且完全一致，说明鉴权或 WAF 统一拦截，别扫路径了，转旁路或先打拦截层本身。这个探针成本 10 秒，能省掉几个小时的无效扫描。很多人上来就挂字典，扫了半天全是 403 还不知道为什么，就是没判断过这个入口的扫描模型成不成立。
+      - paragraph [ref=e89]: 还有一种情况要果断换路子：全端口都 403、所有 Host 头都 403、所有路径都 403、响应还完全一致——这说明前面是一层硬 WAF 或硬鉴权，入口彻底封死了。继续在这上面耗是负收益。正确做法是标记为硬封锁，把精力转到这资产的其他入口，一个后端不会只有一个入口，封死一个不代表全封死。
+      - separator [ref=e90]
+      - heading "四、二级业务目录" [level=2] [ref=e91]
+      - paragraph [ref=e92]: 目录爆破是三件套之一，但通常只爆一级目录，而且只爆字典里那几个通用词（admin/login/test/phpmyadmin）。值钱的业务接口，爆破到不了。
+      - paragraph [ref=e93]:
+        - text: 这里要分清一件事：一级目录是技术结构，二级目录是业务逻辑。
+        - code [ref=e94]: /admin/
+        - text: 、
+        - code [ref=e95]: /api/
+        - text: 、
+        - code [ref=e96]: /user/
+        - text: 、
+        - code [ref=e97]: /login
+        - text: 这些一级目录是技术结构，命名通用，字典里有，能爆出来。但
+        - code [ref=e98]: /api/order/export/detail
+        - text: 、
+        - code [ref=e99]: /admin/system/permission/role/list
+        - text: 、
+        - code [ref=e100]: /user/profile/avatar/upload
+        - text: 这些二级及以下目录是业务逻辑，命名是企业自定义的，任何字典里都没有，爆破命中率约等于零。爆破解决的是命名通用的问题，解决不了业务自定义的问题，而真正承载业务、真正有漏洞的接口，全在二级及以下。
+      - paragraph [ref=e101]:
+        - text: 所以二级目录靠的是
+        - strong [ref=e102]: 读和推，不是爆
+        - text: 。最准的是读 JS，前端所有的 API 调用明文写在 JS 里（axios/fetch/wx.request 的 url 参数），提取出来就是完整的业务路径表，这是开发者亲笔写的，比任何探测都准；Source Map 忘关的话，连函数名、参数、注释一起还原。其次是读接口文档，Swagger/OpenAPI 的
+        - code [ref=e103]: /swagger-ui.html
+        - text: 、
+        - code [ref=e104]: /v2/api-docs
+        - text: 、
+        - code [ref=e105]: /v3/api-docs
+        - text: ，YApi、Apifox、Eolinker 如果未授权，完整业务接口表直接拿到，带参数带示例。再就是读前端路由表，SPA（Vue/React/Angular）的 router 配置里，每个路由路径对应一个业务页面，路由路径约等于业务功能清单，打包后的 JS 里路由表是明文，反混淆一下就能读。还有读报错回显，请求一个不存在的下级路径，有些框架的错误处理会列出合法的 sibling 路径。以及业务语义推导，看到
+        - code [ref=e106]: /api/order
+        - text: 就推导 list、detail、create、update、delete、export、import、cancel，看到
+        - code [ref=e107]: /api/user
+        - text: 就推导 profile、setting、avatar、password、permission、session，业务命名有规律，推导比爆破高效得多；摸清一个业务实体的命名风格，同系统其他实体大概率遵循同样的规律。如果手里有测试账号，最完整的办法是正常把系统用一遍，burp 全程抓包，所有路径、参数、调用顺序一次性到手。
+      - paragraph [ref=e108]:
+        - text: 爆破也不是完全没用，在老系统或经典架构（PHP/JSP 单体、早期 SSH 框架）下，目录结构通用，字典命中率高；探测框架默认路径（actuator、swagger、phpinfo、管理后台）这些通用项，字典也能覆盖。但一旦确认是现代微服务或前后端分离架构，爆破的业务接口命中率趋近于零，就该切到读的模式。判断架构很简单，看首页是不是只有一个 div 挂载点加一堆 JS bundle 的 SPA，看 API 是不是
+        - code [ref=e109]: /api/v1/xxx
+        - text: 的 REST 风格，是的话就别爆了，去读 JS。
+      - separator [ref=e110]
+      - heading "五、从前端反推后端" [level=2] [ref=e111]
+      - paragraph [ref=e112]:
+        - text: 现代系统几乎都是前后端分离部署。前端是一个白盒——它把后端的接口契约、鉴权方式、环境配置、错误码体系，全部用明文 JavaScript 重新实现了一遍。
+        - strong [ref=e113]: 读前端等于读一份最准确的后端文档
+        - text: ，而且是开发者亲笔维护、永远不会过时的那种。
+      - paragraph [ref=e114]:
+        - text: 前端能暴露的后端真相很多。API 全表是最直接的，前端每一个网络请求调用的地址，就是后端完整接口清单，比探测准得多，因为这是开发者写死在代码里的真实调用。鉴权逻辑也能反推，前端请求拦截器怎么做——token 存哪（localStorage/cookie/sessionStorage）、怎么附加（Authorization 头/cookie/自定义头）、token 过期怎么刷新、哪些请求免鉴权（白名单）——反推回去就是后端的 token 格式、校验逻辑、签发机制、免鉴权接口清单。这里有一条很关键的链路：
+        - strong [ref=e115]: 前端的鉴权白名单，等于后端未授权可访问的接口
+        - text: 。
+      - paragraph [ref=e116]: 最值钱的是多环境地址。前端为了开发方便，config/env 文件里经常同时列出 prod、test、dev、internal 的后端地址，一份配置文件就把测试环境、灰度环境、内部 API 地址全暴露了。错误码字典也是，前端会维护一份"错误码到提示文案"的映射表，这张表就是后端的错误码全集，能看到后端所有可能的状态和分支。还有第三方依赖，前端 package.json 和锁文件里依赖的 SDK，每个都可能有自己的后端 API、回调地址、密钥，地图 SDK、支付 SDK、推送 SDK、统计 SDK，每一个都是一个独立的暴露面。
+      - paragraph [ref=e117]:
+        - text: Source Map 是开发者送你的源码。生产环境忘关 Source Map 的项目，保守估计 30% 以上。
+        - code [ref=e118]: .map
+        - text: 一还原，前端源码完整回来，包括注释（经常写着"TODO 上线前删除"、"临时调试用"、"内部接口别外暴露"这类）、原始变量名和函数名、完整的接口封装逻辑和参数结构、路由表和状态管理。检查一个站点有没有忘关，看 JS 文件末尾有没有
+        - code [ref=e119]: //# sourceMappingURL=xxx.map
+        - text: ，或者直接请求
+        - code [ref=e120]: .js.map
+        - text: ，10 秒的动作，回报极高。
+      - paragraph [ref=e121]: 把这些关联起来，攻击路径会自己浮现。前端暴露了测试环境地址，测试环境鉴权弱，拿下测试环境，而测试和生产同代码，生产一样有洞。鉴权白名单里有个不该公开的接口，直接打就能绕过登录态。错误码字典里有个"管理员专属"的错误码，反推出有个管理员功能，再去找这个功能的入口。前端调用了第三方 SDK 的回调地址，这个回调地址可能可控，就是 SSRF 或开放重定向。前端不会撒谎，它说的就是后端真实在跑的接口、真实在用的鉴权、真实存在的环境，读透前端，后端的攻击面就露出来一大半。
+      - separator [ref=e122]
+      - heading "六、影子资产与边缘资产" [level=2] [ref=e123]
+      - paragraph [ref=e124]:
+        - text: 值钱的暴露面，几乎都满足一个条件：
+        - strong [ref=e125]: 开发者自己不知道它在暴露，或者忘了它在暴露。
+      - paragraph [ref=e126]: 影子资产（Shadow IT）是开发或业务为了方便自己起的公网服务，测试用的内网穿透、临时演示环境、某个监控看板、某个数据导出工具、某个调试接口。安全团队不知道，资产台账里没有。这类资产不是扫出来的，是从开发活动留下的痕迹里还原出来的。证书的 SAN 字段是一个重要入口，一张证书的 Subject Alternative Name 里经常列一堆内部域名（grafana.internal、test-api、jenkins-ci），命名直接暴露内部系统的存在，而 CT 日志全网可查，这是开发者申请证书时主动暴露的内部拓扑。JS 里的请求也是一个点，生产 JS 不会只请求线上域名，经常残留测试、灰度、内部域名，前端构建没清理干净就跟着上线了。APK、小程序、客户端的硬编码更是金矿，硬编码的 API 地址、灰度环境域名、调试开关后端，全是开发者以为"反正只在内部用"的东西。代码仓库历史也值得翻，被删掉但 Wayback 或 GitHub 缓存里还在的配置文件、docker-compose、nginx.conf，里面写的内部服务架构比任何文档都准。还有被动 DNS 历史，域名解析过的 IP 全部留存，一个现在指向 CDN 的域名，半年前可能直连过内网 IP，那个 IP 现在可能还开着。证书、代码、客户端、历史 DNS，这四个数据源的交叉点，是影子资产最密集的地方。
+      - paragraph [ref=e127]:
+        - text: 还有一种特殊的影子资产是
+        - strong [ref=e128]: 反代后面的内部资产
+        - text: 。公网入口几乎都在反代、网关、WAF 后面，直接打公网 IP 打的是网关，不是后面的应用，但这些内部应用的路由配置往往就藏在网关里。这一块单独留在第八章展开，这里先记住一个判断：
+        - strong [ref=e129]: 反代不是墙，是漏斗
+        - text: ，所有内部服务都得经过它路由，它的配置就是内部拓扑地图。
+      - paragraph [ref=e130]: 边缘资产是指冷门端口和非常规协议。80/443 大家扫，22/3306/6379 大家也扫，但藏东西的端口往往是管控台类（Nacos 8848、Apollo 8070、SkyWalking 8080/11800、Sentinel 8080、XXL-Job 8080、Druid 监控、Spring Boot Admin、各种 MQ 管控台，这些是企业内部系统的命门，默认口令和未授权访问的比例相当高）、调试和监控端口（JMX 1099、Jenkins agent 50000、各种 actuator 端口、pprof 6060、Elasticsearch 9200、各种 metrics exporter）、非常规高位端口（业务自己起的 HTTP 服务挂在 8000 到 65535 的任意端口，全端口扫加 HTTP 探测能捞出一批以为没人扫得到的服务）、以及 UDP 服务（SNMP 161、mDNS 5353、各种服务发现，UDP 扫得人少，信息量大）。全端口加协议识别是边缘资产的核心，只扫 Top 1000 端口会漏掉很多藏起来的东西。
+      - separator [ref=e131]
+      - heading "七、废弃、测试、老系统" [level=2] [ref=e132]
+      - paragraph [ref=e133]: 这一类资产是企业里最危险、最容易被忽略、攻击成功率最高的。
+      - paragraph [ref=e134]:
+        - text: 废弃的老系统、下线的服务、替换掉的旧版本，在企业里的常见状态是：域名还在解析，服务还在跑，但没人维护，漏洞没人修、补丁没人打、口令没人改；同时还连着生产数据库或同一个内网，虽然是"废弃"的，权限却和正式系统一样；开发者以为下线了，实际只是前端入口删了，后端服务还活着，直接访问 IP 或老域名还能用。这类系统的杀伤力在于一个反差：
+        - strong [ref=e135]: 它是最脆的，但和生产同权
+        - text: 。打一个没人维护的老系统，经常比打主系统容易十倍，拿到的权限却一样。
+      - paragraph [ref=e136]: 测试环境是攻击正式环境的最佳跳板。测试环境鉴权普遍弱，弱口令、默认口令、测试账号公开是常态；测试环境经常和生产共享代码，生产的漏洞测试环境一样有，而且测试环境没 WAF、没监控，随便你打；测试环境经常和生产共享数据库、Redis、内网，拿下测试环境，内网横向就能摸到生产；更关键的是，测试环境用的配置文件、密钥、token 经常和生产是同一份，开发者图方便 copy 过去的。发现测试环境的办法：命名规律（test.、dev.、staging.、uat.、pre.、gray. 这类前缀后缀）、证书 SAN 里的测试域名、JS 和客户端里残留的测试 API 地址、测试环境常独立 IP 段（和历史 DNS 交叉能找到）。
+      - paragraph [ref=e137]:
+        - text: 还有老版本的纵向延伸。一个应用现在跑的是 v3，但 v1、v2 的接口可能还共存着（灰度迁移、向下兼容）。老版本接口的鉴权逻辑是旧的，可能有已知绕过，输入校验是旧的，可能有已知漏洞，但它还在跑、还能访问。同一套 API 去试
+        - code [ref=e138]: /v1/
+        - text: 、
+        - code [ref=e139]: /v2/
+        - text: 、
+        - code [ref=e140]: /v3/
+        - text: 前缀并存的情况，经常能捞到该退役却没退役的旧接口。
+      - separator [ref=e141]
+      - heading "八、反代后面的真实应用" [level=2] [ref=e142]
+      - paragraph [ref=e143]:
+        - text: 公网入口等于反代、网关、WAF、CDN。直接打公网，打的是这一层，真正的应用在后面，必须穿透这层才能看到。前面说过，反代存在不是为了保护后端，是为了路由，
+        - strong [ref=e144]: 它的路由配置就是后端应用清单
+        - text: 。
+      - paragraph [ref=e145]:
+        - text: 穿透是一个方法链。第一步是识别反代类型，靠响应头、错误页、特定行为（405 返回内容、OPTIONS 响应、Header 顺序）来判断是 Nginx、Kong、APISIX、Spring Gateway、云厂商 SLB、CDN 还是 WAF。第二步是找反代的管理面，这是 ROI 最高的一步——每个反代都有自己的管控端，未授权访问直接吐路由配置，Kong admin 在 8001、APISIX admin 在 9180、Spring Gateway 看 actuator、Nacos 在 8848。第三步是按路由规则推测后端，网关路由按 path、host、header 分发，path 前缀聚类能出服务清单（
+        - code [ref=e146]: /user-service/
+        - text: 对应 user 服务），Host 头枚举能出虚拟主机，header 切换能测出 A/B 路由。第四步是找后端直连入口，有些后端服务除了挂网关，自己也有独立端口或域名（调试用、兼容老接口），从被动 DNS、历史记录、JS 残留里能找到后端直连地址，绕过网关直达后端，WAF 规则全部失效。第五步是利用 SSRF 让网关当跳板，一旦有 SSRF，通过网关访问内网、通过注册中心发现服务、通过元数据接口拿云凭证，内网拓扑一次性全出。攻网关的配置面，等于拿到整个后端的地图，比逐个打应用高效得多。
+      - separator [ref=e147]
+      - heading "九、中间件、组件、二开与供应链" [level=2] [ref=e148]
+      - paragraph [ref=e149]:
+        - text: 扫到一个 Web 应用，识别出"这是 Spring Boot 2.3"，然后呢？识别版本查 CVE 只是第一步，攻击面往往在
+        - strong [ref=e150]: 二开
+        - text: 上——企业改过源码的中间件、自研的网关插件、定制的组件。
+      - paragraph [ref=e151]:
+        - text: 指纹到版本到 CVE，只是第一层。同一个版本的组件在不同企业暴露面天差地别，原因有两个。一是二开过的中间件改了默认行为，改过 Tomcat 的默认 servlet、定制过 Nginx 的 location、自己写了 Spring 的 Filter，这些改动经常引入新的解析问题、鉴权绕过、路径穿越。二是默认配置没改，Druid 默认监控开着、Actuator 全端点暴露、Swagger 没关、Eureka 任意注册——
+        - strong [ref=e152]: 指纹识别出来之后，第一件事是去打这个组件"默认开启但本该关闭"的功能面，而不是只查 CVE
+        - text: 。
+      - paragraph [ref=e153]:
+        - text: 怎么看出一个中间件被二开过，有几个特征。响应行为偏差：标准 Tomcat 的 404 长这样，这个的不一样，就是改过；标准 Spring 错误响应是
+        - code [ref=e154]: "{\"timestamp\":...,\"status\":...}"
+        - text: ，这个的结构不一样，就是加过全局异常处理。自定义 Header：标准组件不会发的头（X-Gateway-Version、格式特殊的 X-Trace-Id、自定义的 Server 头）都是二开痕迹。报错栈里的包名：如果出现
+        - code [ref=e155]: com.targetcompany.xxx
+        - text: ，直接暴露了自研代码的包结构。路由结构定制：标准框架的 URL 规律和实际看到的 URL 规律之间的差异，指向自研的路由或拦截逻辑。
+        - strong [ref=e156]: 二开的地方，就是开发者亲手写下漏洞的地方
+        - text: ——标准组件的漏洞全世界都在修，二开的漏洞只有这一个企业有，而且没人查、没人补。
+      - paragraph [ref=e157]:
+        - text: 更进一步是供应链指纹的横向打通，这是效率最高的横向发现方式。一个企业用的前端框架、组件库、网关、监控，经常是同一套自研或同一套采购的，识别出一个，就能横向找到所有用同一套的资产。自研前端框架的指纹（特定的 JS 文件名、特定的 CSS class 命名、特定的 meta 标签），拿到 Fofa、Hunter、Shodan 搜这个指纹，这企业所有用这套前端的应用全出来，包括那些散落在各个子域名、台账里没有的系统。自研网关的响应特征（同样的自定义 Header、同样的错误响应结构），横向一搜，所有挂在这个网关后面的应用都暴露。同一个 favicon hash，内部系统爱用同一套部署模板，favicon 一致就是同一套系统，一个 hash 搜全网，同源系统全出。第三方组件也可以反向追踪，用了某个特定版本、有指纹的组件，用这个组件指纹反查，企业的相关资产都能关联起来。
+        - strong [ref=e158]: 供应链指纹是把孤立资产连成资产族的胶水
+        - text: ，一个指纹打穿，关联出一片。
+      - separator [ref=e159]
+      - heading "十、子系统与微应用" [level=2] [ref=e160]
+      - paragraph [ref=e161]:
+        - text: 现代企业系统几乎都是一个壳加 N 个子系统的结构。一个统一登录门户后面挂着 OA、HR、财务、审批、报表、运维十几个子系统；一个主站的 API 实际是 user-center、order-center、payment、search、recommend 等十几个微服务；一个管理后台菜单里每个功能模块都是独立的微应用。
+        - strong [ref=e162]: 发现一个入口，就要把背后的子系统全部摸出来。
+      - paragraph [ref=e163]: 前端经常是微前端架构（qiankun、micro-app、自研），一个页面里实际加载多个子应用的 JS bundle。这些子应用各自有独立部署地址（不同 CDN 路径、不同子域名、不同服务器）、各自有独立 API 端点、各自有独立鉴权（有的松、有的根本没鉴权）。发现方法是把首页所有加载的 JS、CSS、异步 chunk 的 URL 全部提取，每个 chunk 对应一个子应用或功能模块，这些 URL 的域名和路径就是子系统入口清单。
+      - paragraph [ref=e164]:
+        - text: 后端微服务的边界也有识别方法。API 路径前缀就是服务边界，
+        - code [ref=e165]: /api/user/*
+        - text: 是 user 服务、
+        - code [ref=e166]: /api/order/*
+        - text: 是 order 服务，前缀聚类服务清单就出来了。错误响应的差异也能用，不同微服务用的框架和错误处理不同，响应结构、错误码体系不一样，按响应特征聚类边界就出来。响应头里的服务标识更直接，有些网关会在响应头加 X-Service-Name、X-Upstream，直接暴露后端服务名。而注册中心或配置中心一旦未授权，就是终极答案，直接读服务列表。
+      - paragraph [ref=e167]:
+        - text: 这里有一个重点攻击面：
+        - strong [ref=e168]: 子系统的鉴权差异
+        - text: 。主门户鉴权严，不代表子系统都严。主门户走 SSO，子系统信任 SSO 的 token，但有的子系统不校验 token、只看有没有 token，伪造一个就进去了。有的子系统有自己的独立登录入口，口令弱。有的子系统 API 层没鉴权，只有前端 UI 挡着，直接调 API 就绕过。越是边缘的子系统（老旧的、外包做的、临时上的），鉴权越松。发现子系统的意义在于找到这张网里鉴权最薄弱的那个节点，边缘的、没人维护的系统，往往是最容易突破的口子。
+      - separator [ref=e169]
+      - heading "十一、C 端与 B 端的串联" [level=2] [ref=e170]
+      - paragraph [ref=e171]: 讲到这里有一个很典型的关联值得单独拎出来说，就是 C 端（用户端）和 B 端（管理端）之间的串联。很多测试拿到一个 C 端，注册登录测一圈就结束了，其实 C 端和 B 端往往不是两个独立系统，而是同一个业务系统的两个面——它们共用后端服务、共用数据库、共用鉴权体系、共用代码仓库，甚至部署在同源的域名、同套证书、同套前端框架之下。这层关系决定了，找到 C 端就等于找到了 B 端入口的一半，剩下的工作是把这个关联挖出来。
+      - paragraph [ref=e172]: 先说怎么从 C 端发现 B 端的存在和入口。最直接的是看权限模型。C 端的用户对象里如果有 role、userType、permission、isAdmin 这类字段，就说明后端是按角色区分权限的，那么一定存在需要高权限才能访问的功能，那就是 B 端。这些字段暴露的不只是 B 端的存在，还有鉴权是怎么做的——基于 role 还是基于 permission 列表，是 RBAC 还是更细粒度的权限，这些信息直接决定了后面怎么打越权。
+      - paragraph [ref=e173]:
+        - text: C 端的 JS 是挖 B 端的金矿。前端打包没清理干净的情况非常普遍，生产 JS 里经常残留 admin 路由、admin 接口、管理功能的组件代码。grep 一遍 C 端的 JS，搜 admin、manage、console、backend、permission、role 这些关键词，经常能直接翻出 B 端的路由表和接口路径。还有一种是权限判断的残留，C 端代码里写着
+        - code [ref=e174]: if (user.role === 'admin')
+        - text: 这类逻辑，等于明告诉你有 B 端，以及 B 端的入口在什么路径下。Source Map 如果忘关，这些信息连同注释一起还原，挖起来更省事。
+      - paragraph [ref=e175]:
+        - text: 接口命名规律也能推导。C 端的接口如果是
+        - code [ref=e176]: /api/user/profile
+        - text: 、
+        - code [ref=e177]: /api/order/create
+        - text: ，那 B 端大概率是
+        - code [ref=e178]: /admin/user/list
+        - text: 、
+        - code [ref=e179]: /admin/user/manage
+        - text: 、
+        - code [ref=e180]: /admin/order/manage
+        - text: 这种结构。C 端有什么业务实体，B 端就有什么管理功能，因为后端的数据模型是共用的。看到 C 端能注册、能登录、能改资料，就一定有地方能管理这些用户，那就是 B 端。功能完整性是 B 端存在的逻辑必然，有 C 端在产生数据，就一定有 B 端在做管理。
+      - paragraph [ref=e181]:
+        - text: 域名和部署同源是另一个切入点。C 端是
+        - code [ref=e182]: www.target.com
+        - text: ，B 端大概率是
+        - code [ref=e183]: admin.target.com
+        - text: 、
+        - code [ref=e184]: manage.target.com
+        - text: 、
+        - code [ref=e185]: console.target.com
+        - text: 、
+        - code [ref=e186]: backend.target.com
+        - text: 、
+        - code [ref=e187]: ops.target.com
+        - text: 。证书的 SAN 字段、被动 DNS、带 admin/manage 这些词的子域名字典都能验证。如果 C 端用了自研框架或自研网关，用前面供应链指纹那一招，Fofa、Hunter 搜这个指纹，同一个企业用这套框架的 B 端系统会一起出来。代码仓库也是一个来源，C 端和 B 端在 GitLab 里经常是两个 repo，或者一个 monorepo 下的两个目录，从 C 端的 repo 顺藤摸瓜能找到 B 端。
+      - paragraph [ref=e188]:
+        - text: 找到 B 端之后，测试的重心和 C 端完全不一样。B 端的核心攻击面是
+        - strong [ref=e189]: 越权
+        - text: ，而且主要是垂直越权——用 C 端的低权限身份去够 B 端的高权限功能。这是 B 端测试最高产的方向，原因在于很多系统的鉴权只做在了前端 UI 层，B 端的菜单按角色隐藏，但后端 API 该有的功能都在，只是没在前端露出来。这时拿 C 端注册用户的登录态，直接调用 B 端的 API，如果 API 层没做角色校验，就直接打穿了。
+      - paragraph [ref=e190]: 还有一个很常见的点：SSO 或 token 的跨端通用。C 端和 B 端如果共用一套鉴权体系，C 端登录拿到的 token，B 端也认。这意味着你不需要 B 端的账号，用 C 端注册一个账号拿到的 token，就能以这个身份去访问 B 端的接口，剩下的问题就是这个 token 对应的权限边界在哪里——而很多系统的 token 里直接带着 role，这个 role 是可以被篡改或伪造的（JWT 改 role、session 里 role 字段可控），这就是典型的垂直越权链路。
+      - paragraph [ref=e191]: B 端还经常有 C 端没有的高危功能，这些功能是出大洞的地方：批量操作（批量删除、批量导出，一旦越权影响面巨大）、文件导入导出（导入触发解析漏洞、导出触发 SSRF 或任意文件读）、脚本执行或模板渲染（后台富文本、自定义页面、规则引擎，SSTI 和 RCE 的高发区）、直接执行 SQL 或查询构建器（后台自带的数据查询功能）、以及各种系统级配置（数据库连接、密钥、第三方接口配置的查看和修改）。这些功能在 C 端几乎不存在，但 B 端几乎是标配，一旦从 C 端越权够到这些功能，杀伤力远超 C 端能挖到的普通业务漏洞。
+      - paragraph [ref=e192]: 所以 C 端到 B 端的完整链路可以串成一条：C 端正常注册登录，抓包摸清接口和鉴权机制，从用户对象里发现权限字段确认 B 端存在，从 JS 残留里挖出 B 端的路由和接口，用 C 端的登录态去调这些 B 端接口，测试 API 层有没有做角色校验，一旦没有就完成垂直越权，再去够 B 端那些高危功能。这条链路里每一步的信号都来自上一步，是典型的把一个种子展开成网络的过程——C 端是种子，B 端和它的越权路径，都是从这颗种子里连出来的。
+      - separator [ref=e193]
+      - heading "十二、用开发运维的视角看资产" [level=2] [ref=e194]
+      - paragraph [ref=e195]:
+        - text: 这一节讲一个视角的转换。做资产发现通常用的是攻击者视角，找漏洞、找入口。但换成开发运维的视角去看，能看到不一样的东西。两者的区别在于：
+        - strong [ref=e196]: 攻击者视角找的是漏洞点，开发运维视角看的是系统怎么搭起来的
+        - text: 。漏洞是点，系统是网，理解了网，点自己会浮现。
+      - paragraph [ref=e197]:
+        - text: 运维视角下，基础设施本身就是最密集的攻击面。最关键的一点：
+        - strong [ref=e198]: 监控配置是全公司最全的服务清单
+        - text: 。运维为了监控，必须把所有服务列在监控配置里（Prometheus 的 target、Grafana 的 datasource、SkyWalking 的接入配置、各种 APM 的探针列表）。这份清单比安全团队的资产台账全得多、也新得多——安全和业务脱节，资产台账永远滞后，但运维不维护最新清单，监控系统就跑不起来，业务要出事。拿到监控配置，等于拿到真相。基础设施管控台也是重点，注册中心（Nacos/Eureka/Consul）、配置中心（Apollo/Nacos）、消息队列管控台、数据库管控台、日志系统（Kibana）、APM（SkyWalking/Pinpoint），这些是运维天天用的工具，一旦未授权，整个系统的拓扑、配置、密钥、服务依赖关系全暴露。CI/CD 也是服务清单，Jenkins、GitLab CI 的 job 列表、构建产物、部署脚本里写着每个服务部署到哪、用什么镜像、连什么数据库，是最准的部署地图。还有运维的命名规律，服务名是"业务-功能-环境"（user-center-prod），域名是"env.service.domain"（test.api.target.com），IP 段按业务划分，摸清一个命名规则就能推导出一堆资产。
+      - paragraph [ref=e199]: 开发视角下，协作工具就是企业内部的地图。代码仓库（GitLab/Gitea/Gerrit）的项目列表等于服务清单，有几个 repo 就有几个服务或服务模块，每个 repo 的 README、docker-compose、配置文件暴露这个服务的完整部署信息。项目管理（Jira/Tapd/禅道）的项目对应业务模块，能反推有哪些系统在支撑。知识库（Confluence/Wiki/Notion）的空间对应团队组织和系统文档，架构图、部署文档、接口文档、排障记录里经常有敏感信息（数据库地址、内网拓扑、临时口令）。API 平台（YApi/Apifox/Postman workspace）是完整的接口表，开发协作用的 API 文档带参数、带示例、带 mock，未授权的话等于拿到所有接口的说明书。还有开发偷懒即攻击面：配置 copy-paste（测试环境约等于生产环境配置）、密钥复用（测试和正式同一份密钥）、默认端口不改、注释里的内部信息（TODO 临时后门、内部接口上线记得删）、被 revert 但 Git 历史和缓存里还在的敏感提交。
+      - paragraph [ref=e200]:
+        - text: 为什么这个视角值得单独讲？因为攻击者视角是在"找"，而找的前提是你心里已经有要找的东西，找的范围其实被自己的预期框住了。开发运维视角不一样，你不是在找漏洞，是在
+        - strong [ref=e201]: 重建系统被搭建起来的过程
+        - text: 。当你理解了一个系统怎么部署、怎么监控、怎么协作、怎么偷懒，暴露面会自然浮现，因为每一个暴露面都是开发运维在搭建过程中留下的痕迹。运维的监控配置和开发的项目列表，是两家比安全团队更全的资产台账，拿到这两个，等于拿到企业的内部地图。这也是为什么未授权的 Kibana、GitLab、Jenkins、YApi 这类工具，杀伤力经常比一个 Web 漏洞大得多——一个 Web 漏洞只暴露一个点，而这些工具暴露的是整个系统的结构和配置。
+      - separator [ref=e202]
+      - heading "十三、关联编排" [level=2] [ref=e203]
+      - paragraph [ref=e204]: 前面所有章节讲的都是发现，但发现之后，把这些孤立的信息点关联起来，才能看出完整的攻击面。这一步叫编排，也是整篇里最容易被忽略的一环。
+      - paragraph [ref=e205]: 每个资产都不是孤立的，它在多个维度上和其他资产、其他信息关联。代码同源：多个资产用同一套前端、同一套网关、同一套部署模板，背后是同一个开发团队、同一套安全基线，往往同一套漏洞。网络同段：多个资产在同一个 IP 段，背后是同一个机房、同一个 VPC，内网互通。证书同源：多张证书同一个申请主体或同一个邮箱，背后是同一个所有者。解析同 IP：多个域名解析到同一个 IP，背后是同一台机器，拿下其中一个，其他都暴露。供应链同指纹：这个维度前面第九章专门讲过，自研框架、自研网关、同一个 favicon hash、同一个第三方组件，都是把孤立资产连成资产族的胶水，一个指纹打穿能关联出一片。人员同源：多个系统的开发运维是同一批人，背后是同一套密码习惯、同一套配置习惯。这些维度里，指纹类的关联（代码同源、响应同指纹、供应链同指纹）是横向铺开的关键，网络和证书类的关联（网络同段、证书同源、解析同 IP）是纵向深入的依据。
+      - paragraph [ref=e206]:
+        - text: 把这些关联维度建立起来，攻击路径会自己浮现。边缘资产 A 和核心系统 B 解析到同一个 IP，A 是老系统没人维护、B 是核心，那就打 A，同机器提权，横向到 B。测试环境 T 和正式环境 P 用同一套证书、同一套前端指纹，代码同源，那就先在 T 上把漏洞挖出来（没 WAF、随便测），再去 P 上打。三个子系统用同一个 favicon、同一个自研框架，指纹打通，在最弱的那个找到入口，另外两个同框架的同洞。某个资产解析的内网 IP，在另一个资产的 JS 里也被请求过，这就是内网拓扑片段的拼接。
+        - strong [ref=e207]: 孤立的资产点是噪声，关联起来是情报
+        - text: ，攻击路径要靠读图，光扫扫不出来。
+      - separator [ref=e208]
+      - paragraph [ref=e209]:
+        - text: 说到底，资产发现这件事可以浓缩成一个习惯：
+        - strong [ref=e210]: 每次拿到一个响应，都问自己一句——它还告诉了我什么没注意到的
+        - text: 。
+      - paragraph [ref=e211]: 404 是谁返回的，决定了你接下来去打中间件还是挖应用；403 是哪一层拦的，决定了你继续扫还是转旁路；证书的 SAN 字段列了哪些内部域名，就是你下一批要找的资产；一段 JS 里残留的 API 和测试环境地址，是现成的端点清单；favicon 一样、响应头一样的两个系统，大概率是同一套部署，打穿一个等于打穿全部；一个报错栈里的包名，能反推后端的自研代码结构；被动 DNS 记录里那个半年前的内网 IP，现在可能还开着。把这些信号串起来，而不是扫完就过，是整件事的关键。
+      - paragraph [ref=e212]: 三件套人人会用，但三件套之外还有大量展开空间，重点也都在这后面。种子给你了，怎么种出一片攻击面，看你怎么连。
+      - paragraph [ref=e213]: 当然信息收集是一门学不完的技术，如果你有更好更偏门的信息收集思路可以一起交流一下
+      - img "图片" [ref=e215]
+      - paragraph [ref=e216]: 以下广告非k1y师傅，而是我跟他要到了可以带一个自己的小广告，这里感谢k1y在漏洞挖掘方便对我的指导。
+      - generic [ref=e217]:
+        - paragraph [ref=e221]:
+          - strong [ref=e222]: 代码审计培训介绍&广告区域
+        - generic [ref=e228]:
+          - generic [ref=e231]:
+            - paragraph [ref=e234]: 二、第五期课程
+            - img "图片" [ref=e236]
+          - generic [ref=e238]: 第五期课程仍然是以代码审计为主，本次课程还是为三个语言的代码审计0-1讲解，目的为帮助学员完成0-1+1的白盒（代码审计）漏洞挖掘，并且在出货的基础上再+1去出高质量的漏洞（例如组合拳RCE、前台相关漏洞等）。
+          - generic [ref=e242]:
+            - generic [ref=e243]: "1"
+            - generic [ref=e244]:
+              - generic [ref=e245]: 课程周期
+              - paragraph [ref=e247]:
+                - generic [ref=e248]: 开课周期预计到：三个月左右（直播+录播）
+          - paragraph [ref=e265]:
+            - strong [ref=e266]: 课程大纲
+          - generic [ref=e267]: 本次课程分为PHP、JAVA、NET代码审计为直播+录播，为了照顾一些基础较为薄弱的师傅新增基础~技巧~番外（录播课程）。
+          - generic [ref=e271]:
+            - paragraph [ref=e273]: "01"
+            - paragraph [ref=e276]: PHP&JAVA&NET代码审计 (直播+录播)
+          - generic [ref=e278]: 之前课程大纲主要为xxx实战案例，本次课程大纲着重体现思路方向，并非取消了实战部分，实战部分之多不减。
+          - generic [ref=e279]: PHP课程目录
+          - generic [ref=e282]:
+            - text: ✅
+            - generic [ref=e283]: 第一节课：多框架初识&路由认识&参数传递
+          - generic [ref=e284]:
+            - generic [ref=e285]:
+              - text: ✅
+              - generic [ref=e286]: 第二节课：多框架&鉴权分析&认证与鉴权&鉴权方式
+            - generic [ref=e287]:
+              - generic [ref=e288]:
+                - text: ✅
+                - generic [ref=e289]: 第三节课：多框架&常见漏洞函数&回显&非回显
+              - generic [ref=e290]:
+                - generic [ref=e291]:
+                  - text: ✅
+                  - generic [ref=e292]: 第四节课：注入漏洞&常见位置&实战审计注入类漏洞
+                - generic [ref=e293]:
+                  - generic [ref=e294]:
+                    - text: ✅
+                    - generic [ref=e295]: 第五节课：前台RCE漏洞审计&漏洞案例技巧讲解
+                  - generic [ref=e296]:
+                    - generic [ref=e297]:
+                      - text: ✅
+                      - generic [ref=e298]: 第六节课：门户网站CMS&网络设备&审计经验讲解
+                    - generic [ref=e299]:
+                      - generic [ref=e300]:
+                        - text: ✅
+                        - generic [ref=e301]: 第七节课：多框架&鉴权对抗&权限绕过技巧&案例分析
+                      - generic [ref=e302]:
+                        - generic [ref=e303]:
+                          - text: ✅
+                          - generic [ref=e304]: 第八节课：组合拳RCE漏洞分析&漏洞组合拳利用&案例
+                        - generic [ref=e305]:
+                          - generic [ref=e306]:
+                            - text: ✅
+                            - generic [ref=e307]: 第九节课：PHP下反序列化漏洞&魔术方法&pop链分析
+                          - generic [ref=e308]:
+                            - generic [ref=e309]:
+                              - text: ✅
+                              - generic [ref=e310]: 第十节课：PHP下反序列化漏洞实战&phar协议RCE案例
+                            - generic [ref=e311]: JAVA课程目录
+                            - generic [ref=e314]:
+                              - generic [ref=e315]:
+                                - text: ✅
+                                - generic [ref=e316]: 第一节课：Servlet&Spring Boot&Spring MVC&Struts2
+                              - generic [ref=e317]:
+                                - generic [ref=e318]:
+                                  - text: ✅
+                                  - generic [ref=e319]: 第二节课：多框架下&拦截器&认证鉴权&组件鉴权分析
+                                - generic [ref=e320]:
+                                  - generic [ref=e321]:
+                                    - text: ✅
+                                    - generic [ref=e322]: 第三节课：多框架下&权限绕过&鉴权对抗&案例分析
+                                  - generic [ref=e323]:
+                                    - generic [ref=e324]:
+                                      - text: ✅
+                                      - generic [ref=e325]: 第四节课：常见漏洞函数&案例分析&审计技巧
+                                    - generic [ref=e326]:
+                                      - generic [ref=e327]:
+                                        - text: ✅
+                                        - generic [ref=e328]: 第五节课：前台漏洞审计&组合拳rce漏洞&技巧&案例
+                                      - generic [ref=e329]:
+                                        - generic [ref=e330]:
+                                          - text: ✅
+                                          - generic [ref=e331]: 第六节课：反序列化&CC链利用&反序列化漏洞利用
+                                        - generic [ref=e332]:
+                                          - generic [ref=e333]:
+                                            - text: ✅
+                                            - generic [ref=e334]: 第七节课：
+                                            - text: Ognl&SpEl&EL表达式注入&漏洞案例
+                                          - generic [ref=e335]:
+                                            - generic [ref=e336]:
+                                              - text: ✅
+                                              - generic [ref=e337]: 第八节课：内存马简介&内存马原理分析&内存马注入方式
+                                            - generic [ref=e338]:
+                                              - generic [ref=e339]:
+                                                - text: ✅
+                                                - generic [ref=e340]: 第九节课：RMI&JNDI注入&JNDI注入漏洞利用&案例
+                                              - generic [ref=e341]:
+                                                - generic [ref=e342]:
+                                                  - text: ✅
+                                                  - generic [ref=e343]: 第十节课：组件漏洞&shiro&fastjson&log4j分析&利用
+                                                - generic [ref=e344]: .NET课程目录
+                                                - generic [ref=e350]:
+                                                  - generic [ref=e351]:
+                                                    - text: ✅
+                                                    - generic [ref=e352]: 第一节课：初识.NET&Web From & MVC架构框架分析
+                                                  - generic [ref=e353]:
+                                                    - generic [ref=e354]:
+                                                      - text: ✅
+                                                      - generic [ref=e355]: 第二节课：Web From&MVC框架&鉴权分析&认证方式
+                                                    - generic [ref=e356]:
+                                                      - generic [ref=e357]:
+                                                        - text: ✅
+                                                        - generic [ref=e358]: 第三节课：多框架下&鉴权对抗&权限绕过分析&案例
+                                                      - generic [ref=e359]:
+                                                        - generic [ref=e360]:
+                                                          - text: ✅
+                                                          - generic [ref=e361]: 第四节课：注入漏洞分析&文件操作类漏洞&实战分析
+                                                        - generic [ref=e362]:
+                                                          - generic [ref=e363]:
+                                                            - text: ✅
+                                                            - generic [ref=e364]: 第五节课：常见漏洞位置&前台漏洞审计&漏洞案例讲解
+                                                          - generic [ref=e365]:
+                                                            - generic [ref=e366]:
+                                                              - text: ✅
+                                                              - generic [ref=e367]: 第六节课：组合拳RCE漏洞分析&组合拳RCE案例讲解
+                                                            - paragraph [ref=e368]: ✅ 第七节课：.NET反序列化漏洞初识&反序列化漏洞原理
+                                                            - paragraph [ref=e369]: ✅ 第八节课：.NET安全反序列化链&反序列化触发场景
+                                                            - paragraph [ref=e370]: ✅ 第九节课：.NET反序列化漏洞案例&反序列化漏洞分析
+                                                - generic [ref=e374]:
+                                                  - paragraph [ref=e376]: "02"
+                                                  - paragraph [ref=e379]: 基础~技巧~番外（录播)
+                                                - generic [ref=e381]: 该篇章为长期更新
+                                                - generic [ref=e385]:
+                                                  - generic [ref=e386]: "1"
+                                                  - generic [ref=e387]:
+                                                    - generic [ref=e388]: 基础篇章
+                                                    - generic [ref=e389]:
+                                                      - paragraph [ref=e390]: 1、由于之前上课时部分师傅存在一定基础，刚开始的课程部分师傅认为自己可以跟的上等问题，导致时间的浪费。
+                                                      - paragraph [ref=e391]
+                                                      - paragraph [ref=e392]: 2、同时有一定的师傅存在无法搭建源码，以及软件下载等问题，于是将这种基础问题，统一归纳为基础篇章，供师傅们学习，节省师傅们时间提升学习效率及课程质量
+                                                      - paragraph [ref=e393]
+                                                      - paragraph [ref=e394]: 3、同时面对部分学员频繁提出的一些问题，针对该问题同样会进行解答，并且进行录制上传至基础篇章中。
+                                                - generic [ref=e397]:
+                                                  - generic [ref=e398]: "2"
+                                                  - generic [ref=e399]:
+                                                    - generic [ref=e400]: 技巧篇章
+                                                    - paragraph [ref=e402]: 1、随着自己技术的进步也了解到了一些新型的技巧或者手法，例如sql注入的某一个技巧，但是重新讲解又浪费大量时间，特地新增了技巧篇章，将单独的技巧进行讲解。
+                                                - generic [ref=e405]:
+                                                  - generic [ref=e406]: "3"
+                                                  - generic [ref=e407]:
+                                                    - generic [ref=e408]: 番外篇章
+                                                    - paragraph [ref=e410]: 1、自己在第四期讲过一些逆向相关，并且还存在相关的一些好的案例，得到了挺多师傅的认可，例如某APP接管存储桶等案例，于是之后在有好的案例将进行上传更新。
+                                                - paragraph [ref=e427]:
+                                                  - strong [ref=e428]: 课程思维导图
+          - generic [ref=e429]:
+            - img "图片" [ref=e431]
+            - paragraph [ref=e432]
+            - strong [ref=e437]: 常见疑问&课程讲解
+          - generic [ref=e444]:
+            - generic [ref=e445]:
+              - generic [ref=e446]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e448]:
+                - generic [ref=e449]: 第五期课程收费多少？
+            - generic [ref=e450]:
+              - generic [ref=e451]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e453]:
+                - generic [ref=e454]: 本次课程收费仍然是1688，并且还是承诺一次报名后续不再进行任何二次收费保障（包含内部平台，以及后续推出一系列内容均可观看）。
+          - generic [ref=e460]:
+            - generic [ref=e461]:
+              - generic [ref=e462]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e464]: 什么时间段上课，上课周期是多长时间？
+            - generic [ref=e465]:
+              - generic [ref=e466]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e468]:
+                - generic [ref=e469]: 第五期课程【直播+录播】上课周期为三个月，一般集中在周五六日这三天，一周保持2～3节课，每节课1小时左右。
+          - generic [ref=e475]:
+            - generic [ref=e476]:
+              - generic [ref=e477]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e479]: 作为学员，我们都有哪些权益？
+            - generic [ref=e480]:
+              - generic [ref=e481]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e483]:
+                - generic [ref=e484]: 首先最关键的就是课程内容是可以一直学习的，同时内部报告平台也可进行观看，答疑是不限时长，不限类型方向，任何方向均可，再次同时代码审计最关键的就是源码，源码&课件&视频都是给兄弟们配套的，当然无聊找小朋友聊天一起打游戏也可以哦。
+          - generic [ref=e490]:
+            - generic [ref=e491]:
+              - generic [ref=e492]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e494]: 学完之后可以达到什么水平？
+            - generic [ref=e495]:
+              - generic [ref=e496]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e498]:
+                - generic [ref=e499]: 学完之后可以达到可以进行独立审计的水平，在面对php、JAVA、NET主流语言的源码，可以进行独立审计，验证漏洞，对于一些JAVA安全内容例如：反序列化，内存马等也有一定的理解，可以进行打反序列化漏洞、注入内存马等操作，同时PHP的反序列化、pop链，phar协议等利用也有一定理解，且此类漏洞导致RCE均有案例。
+          - generic [ref=e505]:
+            - generic [ref=e506]:
+              - generic [ref=e507]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e509]: 0基础可以学吗？
+            - generic [ref=e510]:
+              - generic [ref=e511]:
+                - generic:
+                  - img "图片"
+              - generic [ref=e512]:
+                - paragraph [ref=e513]:
+                  - generic [ref=e514]: 1、这是大家最常问的一个问题，0基础是可以的，我的代码审计课程一直秉持着帮助大家完成代码审计0-1的目标，同时往期（第四期）课程新增了进阶课，其目的也是帮助大家完成0-1出洞到0-1出有质量的漏洞。
+                - paragraph [ref=e515]
+                - paragraph [ref=e516]:
+                  - generic [ref=e517]: 2、另外考虑到有的学员基础较为薄弱，本期同时也开了番外篇&基础篇，师傅们可以观看这块分区课程内容，此类分块课程目的就是为协助到一些基础比较薄弱的师傅们。
+          - generic [ref=e523]:
+            - generic [ref=e524]:
+              - generic [ref=e525]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e527]: 是那种读PPT拿着靶场讲解吗？
+            - generic [ref=e528]:
+              - generic [ref=e529]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e531]:
+                - generic [ref=e532]: 不会，课程均使用一些0Day&1Day&Nday优质漏洞来进行授课，且本期案例均为从简-难漏洞案例，深度体验代码审计当中的难易区分，完全杜绝靶场以及去读PPT的，从培训第一期开始到现在，基本为上课开始看几眼课件，让学员熟悉这节课的大概内容等信息，然后直接实操到下课，这一点也是我干培训五期以来一直使用的授课方式。
+          - generic [ref=e538]:
+            - generic [ref=e539]:
+              - generic [ref=e540]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e542]: 是否有简历修改&内推等福利？
+            - generic [ref=e543]:
+              - generic [ref=e544]:
+                - generic:
+                  - img "图片"
+              - paragraph [ref=e546]:
+                - generic [ref=e547]: 有的兄弟，有的，不介意小朋友的指导简历这类的话，随时欢迎大家来骚扰我。
+          - generic [ref=e548]:
+            - generic [ref=e554]:
+              - generic [ref=e555]:
+                - generic [ref=e556]:
+                  - generic:
+                    - img "图片"
+                - paragraph [ref=e558]: 为什么你不新增AI方向的内容？
+              - generic [ref=e559]:
+                - generic [ref=e560]:
+                  - generic:
+                    - img "图片"
+                - paragraph [ref=e562]:
+                  - generic [ref=e563]: 目前我个人认为AI可以帮助我们提升很大的效率，但是前提是AI的使用者本身要懂这个技术，才可以利用AI来降低该技术门槛，提升效率，完全自动化目前感觉还是无法做到，包括课程当中也会使用AI会顺带着给师傅讲了如何用ai来提升效率，同时如果反馈不会使用的师傅较多，会考虑后续在基础～技巧～番外来更新该方向内容。
+            - paragraph [ref=e564]
+            - strong [ref=e569]: 联系方式
+      - img "图片" [ref=e572]
+  - generic [ref=e579]:
+    - link "进击安全" [ref=e589]
+    - generic [ref=e593]:
+      - button "赞" [ref=e595]
+      - button "分享" [ref=e598]
+      - button "在看" [ref=e601]:
+        - generic [ref=e602]: 推荐
+      - button "留言 写留言" [ref=e604]:
+        - generic [ref=e605]: 写留言

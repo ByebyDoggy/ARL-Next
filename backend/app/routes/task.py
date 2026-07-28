@@ -277,6 +277,25 @@ def stop_task(task_id):
     return utils.build_ret(ErrorMsg.Success, {"task_id": task_id})
 
 
+# ==========================================
+# 接口 C：续跑任务 (POST /resume/<task_id>)
+# ==========================================
+@ns.route('/resume/<string:task_id>')
+class ResumeTask(ARLResource):
+    @auth
+    def post(self, task_id):
+        """
+        续跑已停止的任务（需任务包含 checkpoint 数据）
+        """
+        try:
+            from app.tasks.domain import resume_task as do_resume
+            do_resume(task_id)
+            return utils.build_ret(ErrorMsg.Success, {"task_id": task_id})
+        except Exception as e:
+            logger.exception(e)
+            return utils.build_ret(ErrorMsg.Error, {"error": str(e)})
+
+
 # (附赠的一张表格) 印制删除任务的表格，询问是否连带删除扫出来的资产数据
 delete_task_fields = ns.model('DeleteTask',  {
     'del_task_data': fields.Boolean(required=False, default=False, description="是否删除任务数据"),

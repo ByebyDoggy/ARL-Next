@@ -60,6 +60,7 @@ def run_task(options):
         CeleryAction.ASSET_SITE_UPDATE: asset_site_update,
         CeleryAction.ADD_ASSET_SITE_TASK: asset_site_add_task,
         CeleryAction.ASSET_WIH_UPDATE: asset_wih_update_task,
+        CeleryAction.RESUME_TASK: resume_task,
     }
     start_time = time.time()
     # 这里监控任务 task_id 和 target 是空的
@@ -235,3 +236,8 @@ def asset_wih_update_task(options):
 def asset_site_add_task(options):
     task_id = options["task_id"]
     wrap_tasks.run_add_asset_site_task(task_id)
+
+
+def resume_task(options):
+    task_id = options["task_id"]
+    wrap_tasks.resume_task(task_id)

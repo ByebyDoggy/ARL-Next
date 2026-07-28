@@ -94,6 +94,7 @@ class TaskStatus:
     DONE = "done"
     ERROR = "error"
     STOP = "stop"
+    RESUMED = "resumed"
 
 
 class TaskScheduleStatus:
@@ -212,6 +213,7 @@ class CeleryAction:
     ASSET_SITE_UPDATE = "asset_site_update"     # 暗号：执行资产站点更新
     ADD_ASSET_SITE_TASK = "add_asset_site_task" # 暗号：执行资产站点添加
     ASSET_WIH_UPDATE = "asset_wih_update"       # 暗号：执行资产WIH更新
+    RESUME_TASK = "resume_task"                 # 暗号：续跑已停止的任务
 
 
 error_map = {
