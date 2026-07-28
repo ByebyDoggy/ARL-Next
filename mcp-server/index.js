@@ -271,14 +271,36 @@ async function runSse() {
   // 存储活跃的 SSE 会话
   const transports = {};
 
-  // Token 鉴权中间件
+  // Token 鉴权中间件（通过 ARL API 实时验证）
   function authMiddleware(req, res, next) {
-    // 优先查 query 参数，其次查 Authorization 头
     const token = req.query.token || (req.headers.authorization && req.headers.authorization.replace(/^Bearer\s+/i, ""));
-    if (!token || token !== process.env.ARL_TOKEN) {
-      return res.status(401).json({ error: "Unauthorized: invalid or missing token" });
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized: missing token" });
     }
-    next();
+
+    // 用客户端提交的 Token 测试 ARL API 连通性
+    const validationClient = axios.create({
+      baseURL: `${host}/api`,
+      headers: { "Token": token },
+      timeout: 5000,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    });
+
+    validationClient.get("/dashboard/stats").then(() => {
+      // Token 有效，存入请求对象供后续使用
+      req.clientToken = token;
+      next();
+    }).catch((err) => {
+      if (err.response && err.response.status === 401) {
+        return res.status(401).json({ error: "Unauthorized: invalid token" });
+      }
+      // 网络问题导致 ARL 不可达时，回退到环境变量比对
+      if (token === process.env.ARL_TOKEN) {
+        req.clientToken = token;
+        return next();
+      }
+      return res.status(503).json({ error: "ARL backend unreachable and token fallback failed" });
+    });
   }
 
   // SSE 端点（需携带 Token）
