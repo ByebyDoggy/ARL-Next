@@ -84,12 +84,26 @@ class ConvergenceController:
             if domain and not self._is_noise(domain):
                 new_seeds.add(domain)
 
-        # 3. 证书 CN
+        # 3. 证书 CN + SAN 域名
         for cert in utils.conn_db("cert").find(
-                {"task_id": task_id}, {"subject_cn": 1}):
+                {"task_id": task_id}, {"cert.extensions.subjectAltName": 1, "subject_cn": 1}):
+            # 提取 CN
             cn = cert.get("subject_cn", "")
             if cn and "." in cn and not self._is_noise(cn):
                 new_seeds.add(cn)
+            # 提取 SAN 扩展中的 DNS 条目
+            cert_body = cert.get("cert", {})
+            extensions = cert_body.get("extensions", {}) if isinstance(cert_body, dict) else {}
+            san_raw = extensions.get("subjectAltName", "")
+            if san_raw:
+                for part in str(san_raw).split(","):
+                    part = part.strip()
+                    if part.startswith("DNS:") or part.startswith("dns:"):
+                        domain = part.split(":", 1)[1].strip()
+                        if domain.startswith("*."):
+                            domain = domain[2:]
+                        if domain and "." in domain and not self._is_noise(domain):
+                            new_seeds.add(domain.lower())
 
         # 4. 跳转链
         for s in utils.conn_db("site").find(

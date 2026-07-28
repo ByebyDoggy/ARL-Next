@@ -143,6 +143,40 @@ function createMcpServer(token) {
         },
       },
       {
+        name: "submit_task",
+        description: "下发资产发现任务。支持完整参数控制：域名爆破（可选 test/top1000/top10/subdomainer 类型）、端口扫描（test/top100/top1000/all/custom）、服务识别、站点识别/截图、JS信息提取(web_info_hunter)、文件泄露、SSL证书、Host碰撞(findvhost)等。",
+        inputSchema: {
+          type: "object",
+          properties: {
+            name: { type: "string", description: "任务名称" },
+            target: { type: "string", description: "目标域名或IP，多个用逗号/换行分隔" },
+            domain_brute: { type: "boolean", description: "启用域名爆破 (默认 true)" },
+            domain_brute_type: { type: "string", enum: ["test", "top1000", "top10", "subdomainer"], description: "域名爆破字典类型 (默认 test)" },
+            port_scan_type: { type: "string", enum: ["test", "top100", "top1000", "all", "custom"], description: "端口扫描类型 (默认 test)" },
+            port_scan: { type: "boolean", description: "启用端口扫描 (默认 true)" },
+            service_detection: { type: "boolean", description: "服务识别" },
+            service_brute: { type: "boolean", description: "服务弱口令爆破" },
+            os_detection: { type: "boolean", description: "操作系统识别" },
+            site_identify: { type: "boolean", description: "站点指纹识别" },
+            site_capture: { type: "boolean", description: "站点截图" },
+            site_spider: { type: "boolean", description: "站点爬虫" },
+            file_leak: { type: "boolean", description: "文件泄露检测" },
+            search_engines: { type: "boolean", description: "搜索引擎调用" },
+            arl_search: { type: "boolean", description: "ARL 历史查询碰撞" },
+            alt_dns: { type: "boolean", description: "DNS字典智能生成" },
+            ssl_cert: { type: "boolean", description: "SSL 证书获取" },
+            dns_query_plugin: { type: "boolean", description: "域名查询插件" },
+            skip_scan_cdn_ip: { type: "boolean", description: "跳过CDN IP扫描" },
+            findvhost: { type: "boolean", description: "Host 碰撞" },
+            web_info_hunter: { type: "boolean", description: "WEB JS 信息提取" },
+            npoc_service_detection: { type: "boolean", description: "服务(Python)识别" },
+            nuclei_scan: { type: "boolean", description: "Nuclei 漏洞扫描" },
+            wih: { type: "boolean", description: "WIH Web感染检测" },
+          },
+          required: ["name", "target"],
+        },
+      },
+      {
         name: "search_icp_assets",
         description: "深度挖掘 ICP 任务获取的子资产数据（公众号、小程序、商标等）。",
         inputSchema: {
@@ -210,6 +244,23 @@ function createMcpServer(token) {
         }
         const response = await apiClient.get("/icp/asset", { params: { page, size: Math.min(size, 50), task_id, query_type } });
         return { content: [{ type: "text", text: formatResponse(response.data) }] };
+      }
+
+      if (name === "submit_task") {
+        const payload = { name: toolArgs.name, target: toolArgs.target };
+        const boolFields = ["domain_brute", "port_scan", "service_detection", "service_brute",
+          "os_detection", "site_identify", "site_capture", "site_spider", "file_leak",
+          "search_engines", "arl_search", "alt_dns", "ssl_cert", "dns_query_plugin",
+          "skip_scan_cdn_ip", "findvhost", "web_info_hunter", "npoc_service_detection",
+          "nuclei_scan", "wih"];
+        for (const field of boolFields) {
+          if (toolArgs[field] !== undefined) payload[field] = toolArgs[field];
+        }
+        if (toolArgs.domain_brute_type) payload.domain_brute_type = toolArgs.domain_brute_type;
+        if (toolArgs.port_scan_type) payload.port_scan_type = toolArgs.port_scan_type;
+
+        const response = await apiClient.post("/task/", payload);
+        return { content: [{ type: "text", text: JSON.stringify(response.data, null, 2) }] };
       }
 
       throw new Error(`Unknown tool: ${name}`);

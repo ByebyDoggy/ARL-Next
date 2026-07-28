@@ -76,7 +76,7 @@ class DomainDictType:
 class CollectSource:
     """
     [第一性原理：数据溯源]
-    记录资产数据是通过什么渠道收集到的。这不仅用于界面展示“发现来源”，
+    记录资产数据是通过什么渠道收集到的。这不仅用于界面展示"发现来源"，
     更在权重判断、置信度分析时起关键作用（比如爆破发现的置信度可能高于某个老旧第三方API）。
     """
     DOMAIN_BRUTE = "domain_brute" # 子域名爆破获取
@@ -86,6 +86,7 @@ class CollectSource:
     SITESPIDER = "site_spider"    # 爬虫在网页中发现的链接
     SEARCHENGINE = "search_engine"# 空间测绘引擎(FOFA, Quake等)
     MONITOR = "monitor"           # 计划监控任务自动发现
+    CERT_SAN = "cert_san"         # SSL 证书 SAN 扩展域名
 
 
 class TaskStatus:
@@ -197,7 +198,7 @@ class CeleryAction:
     这是连接 `helpers/task.py` (下发者) 和 `celerytask.py` (执行者) 的通信暗号。
     下发任务时，将特定的 Action 塞进消息队列；Worker 收到后，根据这个暗号
     去 action_map 里找对应的处理函数。
-    如果你想给系统新增一种全新的任务类别，首先就得在这里注册它的“接头暗号”！
+    如果你想给系统新增一种全新的任务类别，首先就得在这里注册它的"接头暗号"！
     """
     IP_TASK = "ip_task"                         # 暗号：跑常规IP任务
     DOMAIN_TASK = "domain_task"                 # 暗号：跑常规域名任务

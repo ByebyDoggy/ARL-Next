@@ -800,6 +800,56 @@ class DomainTask(CommonTask):
 
         return modules.DomainInfo(**item)
 
+    def extract_san_domains(self):
+        """从证书 SAN（subjectAltName）中提取域名并回注到资产池"""
+        if not self.cert_map:
+            return
+
+        san_domains = set()
+        for target, cert_data in self.cert_map.items():
+            extensions = cert_data.get("extensions", {})
+            san_raw = extensions.get("subjectAltName", "")
+            if not san_raw:
+                continue
+            # subjectAltName 格式: DNS:*.ninebot.com, DNS:ninebot.com, DNS:admin.ninebot.com
+            for part in san_raw.split(","):
+                part = part.strip()
+                if part.startswith("DNS:") or part.startswith("dns:"):
+                    domain = part.split(":", 1)[1].strip()
+                    # 去掉通配符前缀
+                    if domain.startswith("*."):
+                        domain = domain[2:]
+                    if domain and "." in domain and not domain.endswith("."):
+                        if domain.endswith(self.base_domain) or self.base_domain.endswith(domain):
+                            san_domains.add(domain.lower())
+
+        if not san_domains:
+            return
+
+        # 过滤掉已存在的域名
+        existing = set()
+        for d in utils.conn_db("domain").find(
+                {"task_id": self.task_id}, {"domain": 1}):
+            existing.add(d.get("domain", "").lower())
+
+        new_domains = san_domains - existing
+        if not new_domains:
+            logger.info("extract_san_domains: all {} SAN domains already exist".format(len(san_domains)))
+            return
+
+        # 构建 DomainInfo 并保存
+        domain_info_list = []
+        for domain in new_domains:
+            info = self.build_single_domain_info(domain)
+            if info:
+                domain_info_list.append(info)
+
+        if domain_info_list:
+            self.save_domain_info_list(domain_info_list, source=CollectSource.CERT_SAN)
+            self.domain_info_list.extend(domain_info_list)
+            logger.info("extract_san_domains: added {} new domains from cert SAN (total SAN: {})".format(
+                len(domain_info_list), len(san_domains)))
+
     # *** 执行域名查询插件
     def dns_query_plugin(self):
         logger.info("start run dns_query_plugin {}".format(self.base_domain))
@@ -887,6 +937,9 @@ class DomainTask(CommonTask):
             self.ssl_cert()
             elapse = time.time() - t1
             self.update_services("ssl_cert", elapse)
+
+            '''***从证书 SAN 提取域名并回注***'''
+            self.extract_san_domains()
 
         # 服务信息存储
         if self.options.get("service_detection"):
