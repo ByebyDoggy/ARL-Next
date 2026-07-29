@@ -172,6 +172,10 @@ function createMcpServer(token) {
             npoc_service_detection: { type: "boolean", description: "服务(Python)识别" },
             nuclei_scan: { type: "boolean", description: "Nuclei 漏洞扫描" },
             wih: { type: "boolean", description: "WIH Web感染检测" },
+            convergence_enabled: { type: "boolean", description: "启用多轮循环收敛（默认 false）" },
+            convergence_max_rounds: { type: "number", description: "最大循环轮次（默认 3）" },
+            convergence_min_new: { type: "number", description: "新增资产小于此值即收敛（默认 5）" },
+            convergence_ratio: { type: "number", description: "新增占比小于此值即收敛（默认 0.05）" },
           },
           required: ["name", "target"],
         },
@@ -258,6 +262,10 @@ function createMcpServer(token) {
         }
         if (toolArgs.domain_brute_type) payload.domain_brute_type = toolArgs.domain_brute_type;
         if (toolArgs.port_scan_type) payload.port_scan_type = toolArgs.port_scan_type;
+        if (toolArgs.convergence_enabled !== undefined) payload.convergence_enabled = toolArgs.convergence_enabled;
+        if (toolArgs.convergence_max_rounds) payload.convergence_max_rounds = toolArgs.convergence_max_rounds;
+        if (toolArgs.convergence_min_new) payload.convergence_min_new = toolArgs.convergence_min_new;
+        if (toolArgs.convergence_ratio) payload.convergence_ratio = toolArgs.convergence_ratio;
 
         const response = await apiClient.post("/task/", payload);
         return { content: [{ type: "text", text: JSON.stringify(response.data, null, 2) }] };

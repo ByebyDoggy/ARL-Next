@@ -105,6 +105,11 @@ add_task_fields = ns.model('AddTask', { # 创建添加任务命名空间。
     "findvhost": fields.Boolean(example=False, default=False),
     "web_info_hunter": fields.Boolean(example=False, default=False, description="WEB JS 中的信息收集"),
     "npoc_service_detection": fields.Boolean(example=False, default=False, description="服务(python)识别"),
+    # 多轮循环收敛参数
+    "convergence_enabled": fields.Boolean(example=False, default=False, description="启用多轮循环收敛"),
+    "convergence_max_rounds": fields.Integer(example=3, default=3, description="最大循环轮次"),
+    "convergence_min_new": fields.Integer(example=5, default=5, description="新增资产小于此值即收敛"),
+    "convergence_ratio": fields.Float(example=0.05, default=0.05, description="新增资产占比小于此值即收敛"),
 })
 
 
