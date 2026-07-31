@@ -307,6 +307,7 @@ async function runSse() {
   // 请求日志（诊断用）
   app.use((req, res, next) => {
     console.error(`[req] ${new Date().toISOString()} ${req.method} ${req.url} session=${req.headers["mcp-session-id"] || "-"} auth=${req.headers.authorization ? "yes" : "no"}`);
+    res.on("finish", () => console.error(`[res] ${req.method} ${req.url} session=${req.headers["mcp-session-id"] || "-"} -> ${res.statusCode}`));
     next();
   });
   // 注意：不使用 express.json()，MCP SDK 的 handleRequest 自行读取请求体
@@ -337,15 +338,19 @@ async function runSse() {
       // ARL API 统一返回 HTTP 200，鉴权结果在 body.code 中
       if (resp.data && resp.data.code === 200) {
         req.clientToken = token;
+        console.error(`[auth] ${new Date().toISOString()} token OK (ARL API)`);
         return next();
       }
+      console.error(`[auth] ${new Date().toISOString()} token invalid (code=${resp.data?.code})`);
       return res.status(401).json({ error: "Unauthorized: invalid token" });
     }).catch((err) => {
       // ARL 网络不可达时回退到环境变量比对
       if (token === envToken) {
         req.clientToken = token;
+        console.error(`[auth] ${new Date().toISOString()} ARL unreachable, fallback to envToken`);
         return next();
       }
+      console.error(`[auth] ${new Date().toISOString()} ARL unreachable and envToken mismatch`);
       return res.status(503).json({ error: "ARL backend unreachable and token fallback failed" });
     });
   }
