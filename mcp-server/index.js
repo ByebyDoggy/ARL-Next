@@ -294,16 +294,17 @@ async function runStdio() {
 }
 
 // ============================================================
-// SSE 模式（每会话独立 Server + 独立 Token）
+// Streamable HTTP 模式（每会话独立 Server + 独立 Token）
 // ============================================================
 async function runSse() {
   const express = require("express");
   const cors = require("cors");
-  const { SSEServerTransport } = require("@modelcontextprotocol/sdk/server/sse.js");
+  const crypto = require("node:crypto");
+  const { StreamableHTTPServerTransport } = require("@modelcontextprotocol/sdk/server/streamableHttp.js");
 
   const app = express();
   app.use(cors());
-  // 注意：不使用 express.json()，因为 MCP SDK 的 handlePostMessage 通过 raw stream 读取请求体
+  // 注意：不使用 express.json()，MCP SDK 的 handleRequest 自行读取请求体
 
   // 存储活跃会话 { sessionId -> { server, transport, lastActive } }
   const sessions = {};
@@ -356,41 +357,63 @@ async function runSse() {
       }
     }
     if (cleaned > 0) {
-      console.error(`[sse-cleanup] removed ${cleaned} idle session(s), remaining: ${Object.keys(sessions).length}`);
+      console.error(`[mcp-cleanup] removed ${cleaned} idle session(s), remaining: ${Object.keys(sessions).length}`);
     }
   }, CLEANUP_INTERVAL_MS);
 
-  // ---------- SSE 端点 ----------
-  app.get("/sse", authMiddleware, async (req, res) => {
-    const transport = new SSEServerTransport("/messages", res);
+  // ---------- MCP 端点（GET 建 SSE 流，POST 发消息）----------
+  // 会话在 SDK 生成 sessionId（initialize 时）后通过 onsessioninitialized 注册
+  function createSessionAndServer(req) {
     const sessionServer = createMcpServer(req.clientToken);
-
-    sessions[transport.sessionId] = { server: sessionServer, transport, lastActive: Date.now() };
-    res.on("close", () => {
-      delete sessions[transport.sessionId];
-      sessionServer.close();
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: () => crypto.randomUUID(),
+      onsessioninitialized: (sessionId) => {
+        sessions[sessionId] = { server: sessionServer, transport, lastActive: Date.now() };
+        transport.onclose = () => {
+          delete sessions[sessionId];
+          sessionServer.close();
+        };
+      },
     });
+    return { transport, sessionServer };
+  }
 
+  app.get("/mcp", authMiddleware, async (req, res) => {
+    const existingSid = req.headers["mcp-session-id"];
+    if (existingSid && sessions[existingSid]) {
+      // 已有会话：SSE 流重连
+      const session = sessions[existingSid];
+      session.lastActive = Date.now();
+      await session.transport.handleRequest(req, res);
+      return;
+    }
+
+    // 首次 GET 建流（可能同时携带 initialize）
+    const { transport, sessionServer } = createSessionAndServer(req);
     await sessionServer.connect(transport);
+    await transport.handleRequest(req, res);
   });
 
-  // ---------- 消息端点 ----------
-  app.post("/messages", async (req, res) => {
-    const sessionId = req.query.sessionId;
-    const session = sessions[sessionId];
-    if (session) {
-      session.lastActive = Date.now();  // 有活动则刷新 TTL
-      await session.transport.handlePostMessage(req, res);
-    } else {
-      res.status(400).json({ error: "Session not found" });
+  app.post("/mcp", authMiddleware, async (req, res) => {
+    const sessionId = req.headers["mcp-session-id"];
+    let session = sessionId ? sessions[sessionId] : null;
+
+    if (!session) {
+      // 首次 POST（initialize）或会话丢失 → 新建会话
+      const { transport, sessionServer } = createSessionAndServer(req);
+      await sessionServer.connect(transport);
+      session = { server: sessionServer, transport };
     }
+
+    session.lastActive = Date.now();  // 有活动则刷新 TTL
+    await session.transport.handleRequest(req, res);
   });
 
   // ---------- 健康检查 ----------
   app.get("/health", (_req, res) => {
     res.json({
       status: "ok",
-      mode: "sse",
+      mode: "streamable-http",
       activeSessions: Object.keys(sessions).length,
       tools: 6,
     });
@@ -403,7 +426,7 @@ async function runSse() {
     });
   });
 
-  console.error(`ARL-Next MCP Server running on SSE transport → http://localhost:${PORT}/sse`);
+  console.error(`ARL-Next MCP Server running on Streamable HTTP transport → http://localhost:${PORT}/mcp`);
   console.error(`  Health check → http://localhost:${PORT}/health`);
 }
 
