@@ -304,6 +304,11 @@ async function runSse() {
 
   const app = express();
   app.use(cors());
+  // 请求日志（诊断用）
+  app.use((req, res, next) => {
+    console.error(`[req] ${new Date().toISOString()} ${req.method} ${req.url} session=${req.headers["mcp-session-id"] || "-"} auth=${req.headers.authorization ? "yes" : "no"}`);
+    next();
+  });
   // 注意：不使用 express.json()，MCP SDK 的 handleRequest 自行读取请求体
 
   // 存储活跃会话 { sessionId -> { server, transport, lastActive } }
