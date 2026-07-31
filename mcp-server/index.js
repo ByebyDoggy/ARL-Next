@@ -367,6 +367,8 @@ async function runSse() {
     const sessionServer = createMcpServer(req.clientToken);
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => crypto.randomUUID(),
+      // 启用 JSON 直接响应模式，避免 POST 响应依赖 SSE 流导致客户端挂起
+      enableJsonResponse: true,
       onsessioninitialized: (sessionId) => {
         sessions[sessionId] = { server: sessionServer, transport, lastActive: Date.now() };
         transport.onclose = () => {
