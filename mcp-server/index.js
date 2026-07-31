@@ -305,8 +305,12 @@ async function runSse() {
   app.use(cors());
   // 注意：不使用 express.json()，因为 MCP SDK 的 handlePostMessage 通过 raw stream 读取请求体
 
-  // 存储活跃会话 { sessionId -> { server, transport } }
+  // 存储活跃会话 { sessionId -> { server, transport, lastActive } }
   const sessions = {};
+
+  // 会话空闲 TTL：超过 30 分钟无活动的会话自动回收，防止 session 泄漏
+  const SESSION_TTL_MS = 30 * 60 * 1000;
+  const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
 
   // ---------- Token 鉴权中间件（通过 ARL API 实时验证）----------
   function authMiddleware(req, res, next) {
@@ -340,12 +344,28 @@ async function runSse() {
     });
   }
 
+  // 定期回收空闲会话
+  setInterval(() => {
+    const now = Date.now();
+    let cleaned = 0;
+    for (const [sid, session] of Object.entries(sessions)) {
+      if (now - session.lastActive > SESSION_TTL_MS) {
+        delete sessions[sid];
+        session.server.close();
+        cleaned++;
+      }
+    }
+    if (cleaned > 0) {
+      console.error(`[sse-cleanup] removed ${cleaned} idle session(s), remaining: ${Object.keys(sessions).length}`);
+    }
+  }, CLEANUP_INTERVAL_MS);
+
   // ---------- SSE 端点 ----------
   app.get("/sse", authMiddleware, async (req, res) => {
     const transport = new SSEServerTransport("/messages", res);
     const sessionServer = createMcpServer(req.clientToken);
 
-    sessions[transport.sessionId] = { server: sessionServer, transport };
+    sessions[transport.sessionId] = { server: sessionServer, transport, lastActive: Date.now() };
     res.on("close", () => {
       delete sessions[transport.sessionId];
       sessionServer.close();
@@ -359,6 +379,7 @@ async function runSse() {
     const sessionId = req.query.sessionId;
     const session = sessions[sessionId];
     if (session) {
+      session.lastActive = Date.now();  // 有活动则刷新 TTL
       await session.transport.handlePostMessage(req, res);
     } else {
       res.status(400).json({ error: "Session not found" });
